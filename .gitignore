@@ -1,0 +1,31 @@
+# IntelliJ
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+
+# Gradle
+.gradle/
+build/
+
+# Java
+out/
+target/
+
+# Logs
+*.log
+
+# Environment variables
+.env
+.env.*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Spring Boot local configs
+application-local.yml
+application-local.yaml
+application-secrets.yml
+application-secrets.yaml
