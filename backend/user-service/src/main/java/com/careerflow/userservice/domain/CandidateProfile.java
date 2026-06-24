@@ -11,11 +11,6 @@ public class CandidateProfile {
     @Column(name = "user_id")
     private String userId;
 
-    @OneToOne
-    @MapsId
-    @JoinColumn(name = "user_id")
-    private User user;
-
     @Column(name = "target_roles")
     private String targetRoles;
 
@@ -35,16 +30,12 @@ public class CandidateProfile {
 
     public CandidateProfile() {}
 
-    public CandidateProfile(User user) {
-        this.userId = user.getId();
-        this.user = user;
+    public CandidateProfile(String userId) {
+        this.userId = userId;
     }
 
     public String getUserId() { return userId; }
     public void setUserId(String userId) { this.userId = userId; }
-
-    public User getUser() { return user; }
-    public void setUser(User user) { this.user = user; }
 
     public String getTargetRoles() { return targetRoles; }
     public void setTargetRoles(String targetRoles) { this.targetRoles = targetRoles; }

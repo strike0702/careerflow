@@ -52,7 +52,7 @@ public class UserService {
         newUser = userRepository.save(newUser);
 
         if ("CANDIDATE".equals(role)) {
-            CandidateProfile profile = new CandidateProfile(newUser);
+            CandidateProfile profile = new CandidateProfile(newUser.getId());
             profile.setUpdatedAt(LocalDateTime.now());
             candidateProfileRepository.save(profile);
         }
@@ -69,7 +69,7 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
 
         CandidateProfile profile = candidateProfileRepository.findById(userId)
-                .orElseGet(() -> new CandidateProfile(user));
+                .orElseGet(() -> new CandidateProfile(user.getId()));
 
         profile.setTargetRoles(targetRoles);
         profile.setTargetSalaryMin(targetSalaryMin);

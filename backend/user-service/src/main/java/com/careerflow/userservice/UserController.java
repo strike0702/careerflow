@@ -36,7 +36,7 @@ public class UserController {
         // Sync user first if not exists
         User user = userService.getOrSyncUser(jwt);
         CandidateProfile profile = userService.getCandidateProfile(user.getId())
-                .orElseGet(() -> new CandidateProfile(user));
+                .orElseGet(() -> new CandidateProfile(user.getId()));
 
         return ResponseEntity.ok(new ProfileResponse(
                 profile.getUserId(),
