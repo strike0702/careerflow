@@ -1,0 +1,26 @@
+info:
+  name: Get Admin Token
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: http://localhost:8080/realms/careerflow-realm/protocol/openid-connect/token
+  body:
+    type: form-urlencoded
+    data:
+      - name: grant_type
+        value: password
+      - name: client_id
+        value: careerflow-api-gateway
+      - name: username
+        value: admin@careerflow.com
+      - name: password
+        value: password
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

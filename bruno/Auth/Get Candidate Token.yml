@@ -1,0 +1,26 @@
+info:
+  name: Get Candidate Token
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: http://localhost:8080/realms/careerflow-realm/protocol/openid-connect/token
+  body:
+    type: form-urlencoded
+    data:
+      - name: grant_type
+        value: password
+      - name: client_id
+        value: careerflow-api-gateway
+      - name: username
+        value: candidate@careerflow.com
+      - name: password
+        value: password
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,15 @@
+info:
+  name: User Service Health Check
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: http://localhost:8081/actuator/health
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
