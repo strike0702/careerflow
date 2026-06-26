@@ -1,0 +1,35 @@
+info:
+  name: Create Application
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: http://localhost:8083/api/v1/applications
+  auth:
+    type: bearer
+    token: ""
+  body:
+    type: json
+    data: |-
+      {
+        "companyName": "Stripe",
+        "jobTitle": "Staff Backend Engineer",
+        "location": "Remote",
+        "jobUrl": "https://stripe.com/jobs/staff-backend-129481",
+        "source": "REFERRAL",
+        "status": "APPLIED",
+        "notes": "Referred by a former coworker.",
+        "referralInfo": {
+          "referred": true,
+          "referrerName": "Jane Smith",
+          "referrerCompanyEmail": "jane@stripe.com",
+          "relationship": "Coworker"
+        }
+      }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

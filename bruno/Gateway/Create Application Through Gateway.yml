@@ -1,0 +1,26 @@
+info:
+  name: Create Application Through Gateway
+  type: http
+  seq: 8
+
+http:
+  method: POST
+  url: http://localhost:9000/api/v1/applications
+  auth:
+    type: bearer
+    token: ""
+  body:
+    type: json
+    data: |-
+      {
+        "companyName": "Google",
+        "jobTitle": "Senior Software Engineer",
+        "source": "LINKEDIN",
+        "status": "WISHLIST"
+      }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

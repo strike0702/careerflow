@@ -1,3 +1,4 @@
 rootProject.name = 'careerflow'
 include 'api-gateway'
 include 'user-service'
+include 'application-service'

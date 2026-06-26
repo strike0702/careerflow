@@ -1,0 +1,30 @@
+info:
+  name: Upsert Offer
+  type: http
+  seq: 5
+
+http:
+  method: PUT
+  url: http://localhost:8083/api/v1/applications/{{applicationId}}/offer
+  auth:
+    type: bearer
+    token: ""
+  body:
+    type: json
+    data: |-
+      {
+        "baseSalary": 160000.00,
+        "joiningBonus": 15000.00,
+        "annualBonus": 20000.00,
+        "stockValue": 45000.00,
+        "currency": "USD",
+        "joiningDate": "2026-08-01",
+        "offerStatus": "PENDING",
+        "notes": "Standard offer package"
+      }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

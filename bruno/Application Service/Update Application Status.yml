@@ -1,0 +1,23 @@
+info:
+  name: Update Application Status
+  type: http
+  seq: 4
+
+http:
+  method: PATCH
+  url: http://localhost:8083/api/v1/applications/{{applicationId}}/status
+  auth:
+    type: bearer
+    token: ""
+  body:
+    type: json
+    data: |-
+      {
+        "status": "INTERVIEWING"
+      }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
