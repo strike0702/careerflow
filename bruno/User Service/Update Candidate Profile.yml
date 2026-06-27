@@ -4,11 +4,20 @@ info:
   seq: 3
 
 http:
-  method: GET
+  method: PUT
   url: http://localhost:8081/api/v1/users/me/profile
   auth:
     type: bearer
-    token: eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJGTzFyMW05ekxTX1FzbWFFSHJwOWhlZi1jNC1tckZjTWl1c3hVWnNtZlJFIn0.eyJleHAiOjE3ODIzMDE5NjYsImlhdCI6MTc4MjMwMTY2NiwianRpIjoiYThiY2Y4MmMtMzJhMy00YjUyLWFjMmItOWM1ZDM0MmNkYjlkIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL3JlYWxtcy9jYXJlZXJmbG93LXJlYWxtIiwic3ViIjoiMjFkNGNiZjEtOWMzMC00NTUzLTgyMTgtM2U5YTNlNmU5NTA4IiwidHlwIjoiQmVhcmVyIiwiYXpwIjoiY2FyZWVyZmxvdy1hcGktZ2F0ZXdheSIsInNlc3Npb25fc3RhdGUiOiI3YTgzMGRhZS05NjZmLTQ2ZjEtOWZmOS1lYTMxODZjNDIwNWIiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbIioiXSwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbIkNBTkRJREFURSJdfSwic2NvcGUiOiJwcm9maWxlIGVtYWlsIiwic2lkIjoiN2E4MzBkYWUtOTY2Zi00NmYxLTlmZjktZWEzMTg2YzQyMDViIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsIm5hbWUiOiJKb2huIENhbmRpZGF0ZSIsInByZWZlcnJlZF91c2VybmFtZSI6ImNhbmRpZGF0ZUBjYXJlZXJmbG93LmNvbSIsImdpdmVuX25hbWUiOiJKb2huIiwiZmFtaWx5X25hbWUiOiJDYW5kaWRhdGUiLCJlbWFpbCI6ImNhbmRpZGF0ZUBjYXJlZXJmbG93LmNvbSJ9.XEdJm2O6uBPn0Kz2nyyoLo2E3nFoDTUGY6qKWdIZPoFKba4jx89uueON37oR0YGOFnIIcOYTcpj9INys2HokZei7WWbFB_FvUDV6ArHBJ3SVfnkBPVKe-PZFqqIbNFr737DyqAFAOQDIQl4_2BgdV5xibFpw36HqSiCljLHGVnM39YoQ6Mjm05PpzgORKV4r2olAKubOExHZTUF_NzFBJBOGBBJdJAronQ-nVMMa8Q5jktjUNOUIFobljKlmOFi0E2JA9p9OLHivCbwJH0NjwQcKvyQlf7EyiFoiINYjLpAi7HM7co-7r1977_OP6gA5xc83YnaIvoBdzprokdUU8w
+    token: ""
+  body:
+    type: json
+    data: |-
+      {
+        "targetRoles": "Staff Backend Engineer",
+        "targetSalaryMin": 150000.0,
+        "targetSalaryMax": 190000.0,
+        "skills": ["Java 21", "Spring Boot 3", "Kubernetes"]
+      }
 
 settings:
   encodeUrl: true
