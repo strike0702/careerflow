@@ -20,20 +20,6 @@ This document tracks intentionally deferred work. Items here are known gaps—no
 
 ---
 
-### User Service JPA Repositories
-
-**Why deferred:** User Service was built incrementally; `UserService` references `UserRepository` and `CandidateProfileRepository` in `adapters.out.persistence`, but those interfaces are not present in the repository.
-
-**Benefits:**
-
-- Clean compile on fresh builds
-- Testable persistence layer
-- Foundation for Flyway migration
-
-**Suggested phase:** Phase 3 (blocker for user-service tests and CI)
-
----
-
 ### Flyway in User Service
 
 **Why deferred:** User Service predates the Flyway strategy adopted in Phase 2. It currently uses Hibernate `ddl-auto: update`.
@@ -224,7 +210,6 @@ This document tracks intentionally deferred work. Items here are known gaps—no
 
 | Item | Phase | Priority |
 |------|-------|----------|
-| User Service repositories | 3 | High |
 | Flyway (user-service) | 3 | High |
 | Shared security module | 3 | Medium |
 | `@PreAuthorize` | 3 | Medium |

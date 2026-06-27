@@ -212,12 +212,11 @@ cd backend && ./gradlew :application-service:test
 1. **Resume and Interview services** are routed by the gateway but not implemented.
 2. **No `@PreAuthorize` role checks** on controllers despite Keycloak roles being mapped.
 3. **User Service lacks automated tests** and uses Hibernate DDL instead of Flyway.
-4. **User Service repository layer** is referenced in code but repository interfaces are missing from the repository (see [technical-debt.md](./technical-debt.md)); a clean build may fail until resolved.
-5. **Gateway does not validate JWTs** — invalid tokens fail at downstream services.
-6. **No correlation IDs, structured logging, or distributed tracing**.
-7. **No CI/CD pipeline**.
-8. **Bruno collection has known errors** (wrong HTTP method on profile update, gateway health check points to wrong port).
-9. **Legacy docs** (`api-contracts.md`) describe APIs and schemas that differ from the Phase 2 implementation.
+4. **Gateway does not validate JWTs** — invalid tokens fail at downstream services.
+5. **No correlation IDs, structured logging, or distributed tracing**.
+6. **No CI/CD pipeline**.
+7. **Bruno collection has known errors** (wrong HTTP method on profile update, gateway health check points to wrong port).
+8. **Legacy docs** (`api-contracts.md`) describe APIs and schemas that differ from the Phase 2 implementation.
 
 ---
 
@@ -225,9 +224,8 @@ cd backend && ./gradlew :application-service:test
 
 See [technical-debt.md](./technical-debt.md) and [decisions/](./decisions/) for detailed tracking.
 
-High-priority items before Phase 3:
+High-priority items for Phase 3:
 
-- Add missing User Service JPA repositories
 - Align Bruno collection with implemented endpoints
 - Consolidate or deprecate outdated API documentation
 - Add user-service tests and Flyway migrations

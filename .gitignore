@@ -9,8 +9,9 @@
 .gradle/
 build/
 
-# Java
-out/
+# Java / IntelliJ compile output (avoid matching adapters/out/ Java packages)
+**/out/production/
+**/out/test/
 target/
 
 # Logs

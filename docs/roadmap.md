@@ -15,7 +15,7 @@ Realistic phased plan based on current implementation status. Items marked ✅ a
 - Candidate profile GET/PUT
 - Bruno collection for auth and user endpoints
 
-**Known gaps:** Missing JPA repository interfaces, no tests, Hibernate DDL instead of Flyway.
+**Known gaps:** No tests, Hibernate DDL instead of Flyway.
 
 ---
 
@@ -49,10 +49,7 @@ Goal: Make the existing services operable and consistent before adding new domai
 | Metrics | Micrometer/Prometheus endpoints beyond basic actuator |
 | Health checks | Readiness/liveness probes; DB connectivity checks |
 | Configuration | Externalized config pattern; profile-based properties |
-| User Service repositories | Add missing JPA repositories; unblock clean builds |
 | Flyway (user-service) | Replace `ddl-auto: update` with versioned migrations |
-| Shared security module | Extract duplicated `SecurityConfig` |
-| `@PreAuthorize` | Enforce `ROLE_CANDIDATE` on business endpoints |
 | Bruno fixes | Correct HTTP methods, ports, token handling |
 | User-service tests | Repository and controller tests |
 | Documentation | Deprecate or align `api-contracts.md` with `api-overview.md` |
