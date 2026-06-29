@@ -1,4 +1,5 @@
 rootProject.name = 'careerflow'
+include 'shared-common'
 include 'api-gateway'
 include 'user-service'
 include 'application-service'
