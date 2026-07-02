@@ -83,6 +83,7 @@ See [docs/architecture.md](docs/architecture.md) for full system design.
 CareerFlow/
 ├── README.md
 ├── backend/                          # Gradle monorepo
+│   ├── shared-common/                # Correlation IDs, logging, shared exceptions
 │   ├── api-gateway/                  # Port 9000 — routing only
 │   ├── user-service/                 # Port 8081 — users & profiles
 │   └── application-service/          # Port 8083 — applications, offers, activities
@@ -95,7 +96,7 @@ CareerFlow/
     ├── project-status.md             # Current implementation status
     ├── architecture.md               # System architecture
     ├── api-overview.md               # Implemented API reference
-    ├── api-contracts.md              # Original design spec (partially outdated)
+    ├── api-contracts.md              # Removed — see api-overview.md
     ├── technical-debt.md             # Deferred work
     ├── roadmap.md                    # Future phases
     ├── setup-guide.md                # Infrastructure setup
@@ -119,7 +120,8 @@ CareerFlow/
   - Activity timeline across all applications
   - Dashboard with aggregated metrics and response rate
 - **Security:** JWT validation at each service; cross-user access returns 404
-- **Flyway migrations** for application-service schema
+- **Flyway migrations** for application-service and user-service schema
+- **Observability:** correlation IDs, structured logging, Prometheus metrics, health probes
 - **Bruno collection** for manual API testing
 
 ### Planned
@@ -202,7 +204,7 @@ cd backend
 
 ```bash
 cd backend
-./gradlew :application-service:test
+./gradlew :application-service:test :user-service:test
 ```
 
 See [docs/setup-guide.md](docs/setup-guide.md) and [docs/local-development.md](docs/local-development.md) for additional setup notes.
@@ -236,9 +238,9 @@ Realm: `careerflow-realm`
 
 ## Flyway Migrations
 
-Application Service uses Flyway with `spring.jpa.hibernate.ddl-auto: validate`.
+Both business services use Flyway with `spring.jpa.hibernate.ddl-auto: validate`.
 
-Migrations live in `backend/application-service/src/main/resources/db/migration/`:
+**Application Service** — `backend/application-service/src/main/resources/db/migration/`:
 
 | Version | File | Creates |
 |---------|------|---------|
@@ -246,7 +248,12 @@ Migrations live in `backend/application-service/src/main/resources/db/migration/
 | V2 | `V2__create_offers.sql` | `offers` table |
 | V3 | `V3__create_activities.sql` | `activities` table |
 
-User Service currently uses Hibernate `ddl-auto: update` (no Flyway yet).
+**User Service** — `backend/user-service/src/main/resources/db/migration/`:
+
+| Version | File | Creates |
+|---------|------|---------|
+| V1 | `V1__create_users.sql` | `users` table |
+| V2 | `V2__create_candidate_profiles.sql` | `candidate_profiles`, `candidate_skills` tables |
 
 ---
 
@@ -333,7 +340,7 @@ No frontend is implemented yet. API testing is done via Bruno or any HTTP client
 |-------|--------|-------|
 | Phase 1 | ✅ Complete | Identity & User Service |
 | Phase 2 | ✅ Complete | Application Service |
-| Phase 3 | Planned | Observability & production readiness |
+| Phase 3 | ✅ Complete | Observability & production readiness |
 | Phase 4 | Planned | Event-driven architecture |
 | Phase 5 | Planned | Resume management |
 | Phase 6 | Planned | Deployment & CI/CD |

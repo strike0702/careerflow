@@ -1,5 +1,6 @@
 package com.careerflow.userservice;
 
+import com.careerflow.common.exception.ResourceNotFoundException;
 import com.careerflow.userservice.adapters.out.persistence.CandidateProfileRepository;
 import com.careerflow.userservice.adapters.out.persistence.UserRepository;
 import com.careerflow.userservice.domain.CandidateProfile;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -66,7 +68,7 @@ public class UserService {
 
     public CandidateProfile updateCandidateProfile(String userId, String targetRoles, Double targetSalaryMin, Double targetSalaryMax, List<String> skills) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         CandidateProfile profile = candidateProfileRepository.findById(userId)
                 .orElseGet(() -> new CandidateProfile(user.getId()));
@@ -74,7 +76,7 @@ public class UserService {
         profile.setTargetRoles(targetRoles);
         profile.setTargetSalaryMin(targetSalaryMin);
         profile.setTargetSalaryMax(targetSalaryMax);
-        profile.setSkills(skills);
+        profile.setSkills(skills == null ? new ArrayList<>() : new ArrayList<>(skills));
         profile.setUpdatedAt(LocalDateTime.now());
 
         return candidateProfileRepository.save(profile);

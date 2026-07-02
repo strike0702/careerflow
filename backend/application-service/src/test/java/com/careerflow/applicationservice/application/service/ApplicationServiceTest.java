@@ -9,7 +9,7 @@ import com.careerflow.applicationservice.application.model.Application;
 import com.careerflow.applicationservice.application.model.ApplicationSource;
 import com.careerflow.applicationservice.application.model.ApplicationStatus;
 import com.careerflow.applicationservice.application.repository.ApplicationRepository;
-import com.careerflow.applicationservice.shared.exception.ResourceNotFoundException;
+import com.careerflow.common.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

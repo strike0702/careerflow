@@ -6,9 +6,7 @@ info:
 http:
   method: GET
   url: http://localhost:8083/api/v1/applications/{{applicationId}}
-  auth:
-    type: bearer
-    token: ""
+  auth: inherit
 
 settings:
   encodeUrl: true

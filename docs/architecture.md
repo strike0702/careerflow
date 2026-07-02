@@ -90,6 +90,16 @@ sequenceDiagram
     Gateway-->>Client: HTTP 200
 ```
 
+### Correlation ID propagation (Phase 3)
+
+Every request carries an `X-Request-ID` header:
+
+1. **Gateway** generates a UUID if the client omits the header, forwards it downstream, and echoes it on the response.
+2. **Business services** bind the value to SLF4J MDC (`requestId`) for structured logging.
+3. **Error responses** include `requestId` in RFC 7807 `ProblemDetail` payloads.
+
+See [ADR-007](./decisions/ADR-007-correlation-id-via-x-request-id.md).
+
 ### Gateway routing
 
 | Route ID | Path | Upstream |
@@ -186,11 +196,13 @@ PostgreSQL :5432
 └── keycloak_db            → Keycloak
 ```
 
-### User Service schema (Hibernate-managed)
+### User Service schema (Flyway-managed)
 
 - `users` — id (Keycloak sub), email, name, role
 - `candidate_profiles` — target roles, salary range, skills
 - `candidate_skills` — element collection join table
+
+Flyway migrations: `V1__create_users.sql`, `V2__create_candidate_profiles.sql`
 
 ### Application Service schema (Flyway-managed)
 
@@ -233,14 +245,11 @@ PostgreSQL :5432
 
 Trade-off: no cross-service JOINs; aggregation requires API calls or eventual consistency (events).
 
-### Why Flyway (application-service)?
+### Why Flyway?
 
 - Version-controlled, reviewable schema changes
 - Reproducible environments (dev, CI, prod)
-- Hibernate `ddl-auto: validate` catches entity/schema drift
-- Avoids accidental schema mutation in production
-
-User Service still uses `ddl-auto: update` — migration to Flyway is planned.
+- Both services use Flyway with Hibernate `ddl-auto: validate`
 
 ### Why JWT `sub` as ownership boundary?
 
@@ -253,32 +262,55 @@ User Service still uses `ddl-auto: update` — migration to Flyway is planned.
 
 ## 10. Error Handling
 
-Application Service uses `@RestControllerAdvice` returning RFC 7807 `ProblemDetail`:
+All services return RFC 7807 `ProblemDetail` responses via a shared `GlobalExceptionHandler` in `shared-common`:
 
-| Condition | HTTP Status |
-|-----------|-------------|
-| Resource not found / wrong owner | 404 |
-| Validation failure (`@Valid`) | 400 |
-| Missing/invalid JWT | 401 (Spring Security default) |
+| Condition | HTTP Status | `detail` |
+|-----------|-------------|----------|
+| Resource not found / wrong owner | 404 | Safe message (e.g. "Application not found") |
+| Validation failure (`@Valid`) | 400 | Field-level validation summary |
+| Missing/invalid JWT | 401 | Spring Security default |
+| Unexpected server error | 500 | "An unexpected error occurred" (no stack traces) |
 
-User Service throws `IllegalArgumentException` for some cases without a global handler.
+Every error includes `status`, `title`, `detail`, and `requestId` (from MDC).
+
+The API Gateway uses a reactive `ErrorWebExceptionHandler` with the same shape.
 
 ---
 
-## 11. Testing Architecture
+## 11. Observability & Operations
 
-Application Service tests use:
+| Capability | Implementation |
+|------------|----------------|
+| Correlation IDs | `X-Request-ID` header; MDC `requestId` |
+| Access logging | Method, path, status, duration — no auth headers or bodies |
+| Structured logging | JSON in `prod` profile; plain text in `dev` |
+| Health probes | `/actuator/health/liveness`, `/actuator/health/readiness` |
+| Metrics | `/actuator/prometheus` (Micrometer) |
+| Configuration | Spring profiles (`dev`, `prod`); env-var overrides |
+
+Shared module: `backend/shared-common/`
+
+---
+
+## 12. Testing Architecture
+
+Application Service and User Service tests use:
 
 - `@SpringBootTest` with `test` profile
 - H2 in-memory database (`MODE=PostgreSQL`)
 - Mock `JwtDecoder` for security tests
-- `@AutoConfigureMockMvc` for HTTP-level ownership tests
+- `@AutoConfigureMockMvc` for HTTP-level ownership and error-format tests
 
 Flyway is disabled in tests; Hibernate `create-drop` builds schema from entities.
 
+| Module | Tests |
+|--------|-------|
+| application-service | 8 (repository, service, security) |
+| user-service | 7 (repository, service, security) |
+
 ---
 
-## 12. Related Documents
+## 13. Related Documents
 
 - [project-status.md](./project-status.md) — implementation checklist
 - [api-overview.md](./api-overview.md) — endpoint reference

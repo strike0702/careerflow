@@ -16,21 +16,7 @@ This document tracks intentionally deferred work. Items here are known gaps—no
 - Consistent actuator/security rules across services
 - Reduced drift between user-service and application-service configs
 
-**Suggested phase:** Phase 3 (alongside configuration improvements)
-
----
-
-### Flyway in User Service
-
-**Why deferred:** User Service predates the Flyway strategy adopted in Phase 2. It currently uses Hibernate `ddl-auto: update`.
-
-**Benefits:**
-
-- Version-controlled schema
-- Consistent with application-service approach
-- Safe production deployments
-
-**Suggested phase:** Phase 3
+**Suggested phase:** Post Phase 3 — revisit when Resume, Notification, or Interview services are added
 
 ---
 
@@ -43,20 +29,7 @@ This document tracks intentionally deferred work. Items here are known gaps—no
 - Enforces Keycloak roles at API level
 - Prevents admin/candidate boundary violations
 
-**Suggested phase:** Phase 3
-
----
-
-### Global Exception Handling (User Service)
-
-**Why deferred:** Application Service introduced `GlobalExceptionHandler` with RFC 7807 `ProblemDetail`. User Service still throws raw exceptions.
-
-**Benefits:**
-
-- Consistent error responses across services
-- Better client experience and debugging
-
-**Suggested phase:** Phase 3
+**Suggested phase:** Post Phase 3 — revisit with shared security module when more services exist
 
 ---
 
@@ -149,7 +122,7 @@ This document tracks intentionally deferred work. Items here are known gaps—no
 - End-to-end request visibility across gateway and services
 - Latency debugging in production
 
-**Suggested phase:** Phase 3 (with correlation IDs and structured logging)
+**Suggested phase:** Phase 6+ (correlation IDs and structured logging are in place from Phase 3)
 
 ---
 
@@ -179,20 +152,6 @@ This document tracks intentionally deferred work. Items here are known gaps—no
 
 ---
 
-### Bruno Collection Fixes
-
-**Why deferred:** Collection grew organically during Phase 1–2 development.
-
-**Known issues:**
-
-- `Update Candidate Profile` uses GET instead of PUT
-- `Gateway Health Check` points to port 8081 instead of 9000
-- Hardcoded JWT in Update Candidate Profile request
-
-**Suggested phase:** Phase 3 (documentation pass follow-up)
-
----
-
 ### Legacy Documentation (`api-contracts.md`)
 
 **Why deferred:** Original design spec written before Phase 2 implementation. Describes different field names (`roleTitle` vs `jobTitle`), separate referrals table, `POST /offers` vs `PUT /offer`, and unimplemented services.
@@ -202,7 +161,7 @@ This document tracks intentionally deferred work. Items here are known gaps—no
 - Single source of truth ([api-overview.md](./api-overview.md))
 - Less confusion for reviewers
 
-**Suggested phase:** Phase 3 — deprecate or rewrite `api-contracts.md` to reference `api-overview.md`
+**Suggested phase:** Resolved — use [api-overview.md](./api-overview.md) as the API reference (`api-contracts.md` removed)
 
 ---
 
@@ -210,16 +169,12 @@ This document tracks intentionally deferred work. Items here are known gaps—no
 
 | Item | Phase | Priority |
 |------|-------|----------|
-| Flyway (user-service) | 3 | High |
-| Shared security module | 3 | Medium |
-| `@PreAuthorize` | 3 | Medium |
-| Global exception handler (user-service) | 3 | Medium |
-| Correlation IDs / structured logging | 3 | Medium |
-| Bruno collection fixes | 3 | Low |
+| Shared security module | Post 3 | Medium |
+| `@PreAuthorize` | Post 3 | Medium |
 | Kafka / events | 4 | Medium |
 | Notification Service | 4 | Medium |
 | Resume Service | 5 | Medium |
 | Interview Service + Feign | 5 | Medium |
 | CI/CD | 6 | High |
-| Distributed tracing | 3–6 | Low |
+| Distributed tracing (OpenTelemetry) | 6+ | Low |
 | Analytics / search | 5+ | Low |

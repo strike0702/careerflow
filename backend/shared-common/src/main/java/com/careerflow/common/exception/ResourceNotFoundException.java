@@ -1,4 +1,4 @@
-package com.careerflow.applicationservice.shared.exception;
+package com.careerflow.common.exception;
 
 public class ResourceNotFoundException extends RuntimeException {
 

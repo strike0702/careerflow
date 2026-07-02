@@ -34,11 +34,15 @@ grant_type=password&client_id=careerflow-api-gateway&username=candidate@careerfl
 | `/api/v1/resumes/**` | Resume Service `:8082` | **Not implemented** |
 | `/api/v1/interviews/**` | Interview Service `:8084` | **Not implemented** |
 
-Actuator (no auth required on services):
+Actuator (no auth required):
 
-- Gateway: `GET http://localhost:9000/actuator/health`
-- User Service: `GET http://localhost:8081/actuator/health`
-- Application Service: `GET http://localhost:8083/actuator/health`
+| Endpoint | Gateway | User Service | Application Service |
+|----------|---------|--------------|---------------------|
+| Liveness | `GET :9000/actuator/health/liveness` | `GET :8081/actuator/health/liveness` | `GET :8083/actuator/health/liveness` |
+| Readiness | `GET :9000/actuator/health/readiness` | `GET :8081/actuator/health/readiness` | `GET :8083/actuator/health/readiness` |
+| Prometheus | `GET :9000/actuator/prometheus` | `GET :8081/actuator/prometheus` | `GET :8083/actuator/prometheus` |
+
+All business API requests should include an optional `X-Request-ID` header for log correlation. Error responses include a matching `requestId` field.
 
 ---
 

@@ -37,22 +37,24 @@ Realistic phased plan based on current implementation status. Items marked ✅ a
 
 ## Phase 3 — Observability & Production Readiness
 
-**Status:** Planned
+**Status:** Complete
 
 Goal: Make the existing services operable and consistent before adding new domains.
 
-| Item | Description |
-|------|-------------|
-| Structured logging | JSON logs, consistent log levels |
-| Correlation IDs | Propagate `X-Request-ID` through gateway and services |
-| Exception handling | Global `@ControllerAdvice` in user-service; align with application-service |
-| Metrics | Micrometer/Prometheus endpoints beyond basic actuator |
-| Health checks | Readiness/liveness probes; DB connectivity checks |
-| Configuration | Externalized config pattern; profile-based properties |
-| Flyway (user-service) | Replace `ddl-auto: update` with versioned migrations |
-| Bruno fixes | Correct HTTP methods, ports, token handling |
-| User-service tests | Repository and controller tests |
-| Documentation | Deprecate or align `api-contracts.md` with `api-overview.md` |
+| Item | Status |
+|------|--------|
+| Structured logging | ✅ JSON in `prod` profile; human-readable in `dev` |
+| Correlation IDs | ✅ `X-Request-ID` via gateway and `shared-common` |
+| Exception handling | ✅ RFC 7807 `ProblemDetail` with `requestId` (all services) |
+| Metrics | ✅ Prometheus via `/actuator/prometheus` |
+| Health checks | ✅ Liveness/readiness probes |
+| Configuration | ✅ Spring profiles; externalized env vars |
+| Flyway (user-service) | ✅ `V1`–`V2` migrations; `ddl-auto: validate` |
+| Bruno fixes | ✅ Readiness/prometheus checks; inherited auth |
+| User-service tests | ✅ Repository, service, and security tests |
+| Documentation | ✅ Updated architecture, status, ADR-007 |
+
+**Deferred from original Phase 3 plan:** Shared security module and `@PreAuthorize` (revisit when more business services exist).
 
 **Not in Phase 3:** New business domains, Kafka, cloud deployment.
 

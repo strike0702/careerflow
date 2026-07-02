@@ -6,9 +6,7 @@ info:
 http:
   method: POST
   url: http://localhost:8083/api/v1/applications
-  auth:
-    type: bearer
-    token: ""
+  auth: inherit
   body:
     type: json
     data: |-

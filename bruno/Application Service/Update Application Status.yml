@@ -6,9 +6,7 @@ info:
 http:
   method: PATCH
   url: http://localhost:8083/api/v1/applications/{{applicationId}}/status
-  auth:
-    type: bearer
-    token: ""
+  auth: inherit
   body:
     type: json
     data: |-

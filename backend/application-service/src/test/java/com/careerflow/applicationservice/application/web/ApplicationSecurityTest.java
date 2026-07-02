@@ -15,6 +15,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
@@ -44,8 +46,13 @@ class ApplicationSecurityTest extends AbstractIntegrationTest {
     @Test
     void userACannotAccessUserBApplication() throws Exception {
         mockMvc.perform(get("/api/v1/applications/{id}", userBApplicationId)
+                .header("X-Request-ID", "security-test-request-id")
                 .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwt -> jwt.tokenValue("user-a").subject("user-a"))))
-            .andExpect(status().isNotFound());
+            .andExpect(status().isNotFound())
+            .andExpect(header().string("X-Request-ID", "security-test-request-id"))
+            .andExpect(jsonPath("$.status").value(404))
+            .andExpect(jsonPath("$.title").value("Not Found"))
+            .andExpect(jsonPath("$.requestId").value("security-test-request-id"));
     }
 
     @Test

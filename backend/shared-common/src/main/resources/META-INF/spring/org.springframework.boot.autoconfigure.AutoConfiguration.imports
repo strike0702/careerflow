@@ -1,1 +1,2 @@
 com.careerflow.common.observability.ObservabilityAutoConfiguration
+com.careerflow.common.exception.ExceptionAutoConfiguration

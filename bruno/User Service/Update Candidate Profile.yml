@@ -6,9 +6,7 @@ info:
 http:
   method: PUT
   url: http://localhost:8081/api/v1/users/me/profile
-  auth:
-    type: bearer
-    token: ""
+  auth: inherit
   body:
     type: json
     data: |-
