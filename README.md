@@ -124,7 +124,8 @@ CareerFlow/
 - **Flyway migrations** for application-service and user-service schema
 - **Observability:** correlation IDs, structured logging, Prometheus metrics, health probes
 - **Bruno collection** for manual API testing
-- **Frontend (React SPA):** Keycloak login, dashboard, applications, profile — via API Gateway only
+- **Frontend (React SPA):** Keycloak login/registration, profile completion banner, dashboard, applications, profile — via API Gateway only
+- **Self-service registration & Google login** via Keycloak hosted pages; new users auto-assigned `CANDIDATE`
 
 ### Planned
 
@@ -226,9 +227,9 @@ npm run dev
 | Frontend | `http://localhost:5173` |
 | API (via Vite proxy) | `http://localhost:5173/api/v1/**` → gateway `:9000` |
 
-Demo login: `candidate@careerflow.com` / `password`
+Demo login: `candidate@careerflow.com` / `password`, or click **Create Account** on the landing screen to self-register a new candidate via Keycloak's hosted registration page.
 
-The frontend uses Keycloak Authorization Code + PKCE and sends all API requests through the gateway (never to individual services directly).
+The frontend uses Keycloak Authorization Code + PKCE and sends all API requests through the gateway (never to individual services directly). New candidates with an incomplete profile see a dismissible **Complete your profile** banner on the dashboard.
 
 ---
 
@@ -254,6 +255,8 @@ Realm: `careerflow-realm`
 | OAuth client | `careerflow-api-gateway` |
 | Demo candidate | `candidate@careerflow.com` / `password` |
 | Roles | `CANDIDATE`, `ADMIN` |
+| Self-registration | Enabled; new users default to `CANDIDATE` via the `/candidates` default group |
+| Google login | Configured via Identity Brokering — requires real OAuth credentials (see [setup-guide.md](docs/setup-guide.md)) |
 
 ---
 
@@ -362,9 +365,11 @@ The frontend provides a dashboard, application management, and candidate profile
 | Phase 1 | ✅ Complete | Identity & User Service |
 | Phase 2 | ✅ Complete | Application Service |
 | Phase 3 | ✅ Complete | Observability & production readiness |
-| Phase 4 | Planned | Event-driven architecture |
-| Phase 5 | Planned | Resume management |
-| Phase 6 | Planned | Deployment & CI/CD |
+| Phase 4 | ✅ Complete | Frontend MVP (React SPA) |
+| Phase 4.1 | ✅ Complete | Self-service registration & onboarding |
+| Phase 5 | Planned | Event-driven architecture |
+| Phase 6 | Planned | Resume management |
+| Phase 7 | Planned | Deployment & CI/CD |
 
 Details: [docs/roadmap.md](docs/roadmap.md)
 

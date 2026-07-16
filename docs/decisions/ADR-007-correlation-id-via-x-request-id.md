@@ -39,4 +39,4 @@ Implementation lives in the `shared-common` Gradle module (servlet filters) and 
 
 **Follow-up:**
 
-- Consider OpenTelemetry integration if multi-hop workflows grow (Phase 6+)
+- Consider OpenTelemetry integration if multi-hop workflows grow (Phase 7+)

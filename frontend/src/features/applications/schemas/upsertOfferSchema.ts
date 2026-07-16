@@ -17,7 +17,7 @@ export const upsertOfferSchema = z
     currency: z
       .string()
       .length(3, 'Currency must be exactly 3 letters')
-      .regex(/^[A-Z]{3}$/, 'Currency must be uppercase ISO 4217 (e.g. USD)'),
+      .regex(/^[A-Z]{3}$/, 'Currency must be uppercase ISO 4217 (e.g. INR)'),
     joiningDate: z.string().optional(),
     offerStatus: z.enum(offerStatuses).optional(),
     notes: z.string().optional(),
@@ -70,7 +70,7 @@ export function offerToFormValues(offer?: {
     joiningBonus: formatAmount(offer?.joiningBonus),
     annualBonus: formatAmount(offer?.annualBonus),
     stockValue: formatAmount(offer?.stockValue),
-    currency: offer?.currency ?? 'USD',
+    currency: offer?.currency ?? 'INR',
     joiningDate: offer?.joiningDate ?? '',
     offerStatus: offer?.offerStatus ?? 'PENDING',
     notes: offer?.notes ?? '',

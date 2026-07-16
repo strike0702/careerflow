@@ -8,6 +8,7 @@ import {
   keycloak,
   login,
   logout,
+  register,
 } from '@/services/keycloak'
 
 type AuthState = 'initializing' | 'authenticated' | 'unauthenticated'
@@ -18,6 +19,7 @@ interface AuthContextValue {
   user: User | undefined
   displayName: string
   login: () => Promise<void>
+  register: () => Promise<void>
   logout: () => Promise<void>
 }
 
@@ -66,6 +68,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await login()
   }, [])
 
+  const handleRegister = useCallback(async () => {
+    await register()
+  }, [])
+
   const handleLogout = useCallback(async () => {
     await logout()
   }, [])
@@ -77,9 +83,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       displayName: user ? `${user.firstName} ${user.lastName}` : getUserDisplayName(),
       login: handleLogin,
+      register: handleRegister,
       logout: handleLogout,
     }),
-    [authState, user, handleLogin, handleLogout],
+    [authState, user, handleLogin, handleRegister, handleLogout],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

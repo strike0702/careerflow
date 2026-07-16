@@ -1,6 +1,6 @@
 # CareerFlow Project Status
 
-Last updated: June 2026 (post Phase 3)
+Last updated: July 2026 (post Phase 4.1)
 
 ---
 
@@ -98,6 +98,15 @@ Clients authenticate with Keycloak, call the API Gateway with a JWT, and each do
 - Gateway CORS for `http://localhost:5173`; Vite `/api` dev proxy
 - TanStack Query, React Hook Form + Zod, shadcn/ui, Recharts, next-themes
 
+### Phase 4.1 — Self-Service Registration & Onboarding ✅
+
+- Keycloak self-registration enabled (`registrationAllowed`, email-as-username, password policy, self-service password reset)
+- Google Identity Provider configured via Keycloak brokering (placeholder credentials — see [setup-guide.md](./setup-guide.md))
+- New users auto-assigned `CANDIDATE` via a Keycloak default group (`/candidates`), regardless of registration path
+- Frontend landing screen (`AuthLanding`) with **Sign In** / **Create Account**, replacing the previous unconditional auto-redirect to Keycloak login
+- Frontend profile completion banner on the dashboard (`ProfileCompletionBanner`): dismissible nudge when profile lacks target role or skill; links to `/profile` without blocking other routes
+- No backend or database changes — lazy `User`/`CandidateProfile` sync (`UserService.getOrSyncUser`) is unchanged; see [ADR-008](./decisions/ADR-008-self-service-registration-and-onboarding.md)
+
 ---
 
 ## Service Responsibilities
@@ -181,6 +190,8 @@ Demo credentials (Keycloak):
 - Admin: `admin@careerflow.com` / `password`
 - OAuth client: `careerflow-api-gateway`
 
+**Self-registration:** enabled in Keycloak. New users (via the hosted registration page or Google) are placed in the `/candidates` default group → realm role `CANDIDATE`. `ADMIN` is never assigned by default. Google login requires real OAuth credentials to be configured (see [setup-guide.md](./setup-guide.md)); the committed realm export ships with placeholders only.
+
 ---
 
 ## Database Ownership
@@ -255,19 +266,19 @@ cd backend && ./gradlew :application-service:test :user-service:test
 
 See [technical-debt.md](./technical-debt.md) and [decisions/](./decisions/) for detailed tracking.
 
-High-priority items for Phase 4+:
+High-priority items for Phase 5+:
 
 - Event-driven architecture (Kafka)
 - `@PreAuthorize` role enforcement (when additional services justify shared security module)
 
 ---
 
-## Planned Roadmap (Phase 4+)
+## Planned Roadmap (Phase 5+)
 
 See [roadmap.md](./roadmap.md) for the full plan.
 
 | Phase | Focus |
 |-------|-------|
-| **Phase 4** | Event-driven architecture (Kafka, notifications) |
-| **Phase 5** | Resume management service |
-| **Phase 6** | Deployment (CI/CD, cloud, monitoring) |
+| **Phase 5** | Event-driven architecture (Kafka, notifications) |
+| **Phase 6** | Resume management service |
+| **Phase 7** | Deployment (CI/CD, cloud, monitoring) |

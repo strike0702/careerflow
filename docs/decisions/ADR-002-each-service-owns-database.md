@@ -44,5 +44,5 @@ Services must not read or write another service's tables. Cross-service data is 
 
 **Follow-up:**
 
-- Implement Resume and Interview services with their own databases (Phase 5)
-- Consider saga/outbox patterns when cross-service transactions are needed (Phase 4)
+- Implement Resume and Interview services with their own databases (Phase 6)
+- Consider saga/outbox patterns when cross-service transactions are needed (Phase 5)

@@ -48,4 +48,4 @@ Migration files:
 
 **Follow-up:**
 
-- Add migration verification to CI (Phase 6)
+- Add migration verification to CI (Phase 7)

@@ -43,7 +43,7 @@ This document tracks intentionally deferred work. Items here are known gaps—no
 - Audit trail replication
 - Future analytics pipeline
 
-**Suggested phase:** Phase 4
+**Suggested phase:** Phase 5
 
 ---
 
@@ -56,7 +56,7 @@ This document tracks intentionally deferred work. Items here are known gaps—no
 - Email/push on status changes, offer deadlines
 - Driven by domain events from application-service
 
-**Suggested phase:** Phase 4
+**Suggested phase:** Phase 5
 
 ---
 
@@ -69,7 +69,7 @@ This document tracks intentionally deferred work. Items here are known gaps—no
 - Versioned resume metadata
 - Attach resume versions to applications (future)
 
-**Suggested phase:** Phase 5
+**Suggested phase:** Phase 6
 
 ---
 
@@ -83,7 +83,7 @@ This document tracks intentionally deferred work. Items here are known gaps—no
 - Accurate active interview counts
 - Feeds richer dashboard metrics
 
-**Suggested phase:** Phase 5 (after or alongside Resume Service)
+**Suggested phase:** Phase 6 (after or alongside Resume Service)
 
 ---
 
@@ -96,7 +96,7 @@ This document tracks intentionally deferred work. Items here are known gaps—no
 - Historical trends, funnel analysis
 - Offloads heavy queries from OLTP databases
 
-**Suggested phase:** Post Phase 6 (only if scale demands it)
+**Suggested phase:** Post Phase 7 (only if scale demands it)
 
 ---
 
@@ -109,7 +109,7 @@ This document tracks intentionally deferred work. Items here are known gaps—no
 - Faster company/title search
 - Elasticsearch/OpenSearch integration
 
-**Suggested phase:** Phase 5+ (when application volume grows)
+**Suggested phase:** Phase 6+ (when application volume grows)
 
 ---
 
@@ -122,7 +122,7 @@ This document tracks intentionally deferred work. Items here are known gaps—no
 - End-to-end request visibility across gateway and services
 - Latency debugging in production
 
-**Suggested phase:** Phase 6+ (correlation IDs and structured logging are in place from Phase 3)
+**Suggested phase:** Phase 7+ (correlation IDs and structured logging are in place from Phase 3)
 
 ---
 
@@ -135,7 +135,7 @@ This document tracks intentionally deferred work. Items here are known gaps—no
 - Live interview counts from Interview Service
 - Composed dashboard without duplicating interview state
 
-**Suggested phase:** Phase 5 (when Interview Service exists)
+**Suggested phase:** Phase 6 (when Interview Service exists)
 
 ---
 
@@ -148,7 +148,7 @@ This document tracks intentionally deferred work. Items here are known gaps—no
 - Automated test runs on PR
 - Repeatable builds and deployments
 
-**Suggested phase:** Phase 6
+**Suggested phase:** Phase 7
 
 ---
 
@@ -171,10 +171,10 @@ This document tracks intentionally deferred work. Items here are known gaps—no
 |------|-------|----------|
 | Shared security module | Post 3 | Medium |
 | `@PreAuthorize` | Post 3 | Medium |
-| Kafka / events | 4 | Medium |
-| Notification Service | 4 | Medium |
-| Resume Service | 5 | Medium |
-| Interview Service + Feign | 5 | Medium |
-| CI/CD | 6 | High |
-| Distributed tracing (OpenTelemetry) | 6+ | Low |
-| Analytics / search | 5+ | Low |
+| Kafka / events | 5 | Medium |
+| Notification Service | 5 | Medium |
+| Resume Service | 6 | Medium |
+| Interview Service + Feign | 6 | Medium |
+| CI/CD | 7 | High |
+| Distributed tracing (OpenTelemetry) | 7+ | Low |
+| Analytics / search | 6+ | Low |

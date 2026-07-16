@@ -36,6 +36,12 @@ export function login(): Promise<void> {
   })
 }
 
+export function register(): Promise<void> {
+  return keycloak.register({
+    redirectUri: window.location.origin,
+  })
+}
+
 export function logout(): Promise<void> {
   return keycloak.logout({
     redirectUri: window.location.origin,

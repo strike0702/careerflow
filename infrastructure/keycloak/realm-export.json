@@ -2,6 +2,15 @@
   "id": "careerflow-realm",
   "realm": "careerflow-realm",
   "enabled": true,
+  "registrationAllowed": true,
+  "registrationEmailAsUsername": true,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "editUsernameAllowed": false,
+  "rememberMe": true,
+  "verifyEmail": false,
+  "passwordPolicy": "length(8) and notUsername",
   "roles": {
     "realm": [
       {
@@ -14,6 +23,18 @@
       }
     ]
   },
+  "groups": [
+    {
+      "name": "candidates",
+      "path": "/candidates",
+      "realmRoles": [
+        "CANDIDATE"
+      ]
+    }
+  ],
+  "defaultGroups": [
+    "/candidates"
+  ],
   "clients": [
     {
       "clientId": "careerflow-api-gateway",
@@ -29,7 +50,28 @@
         "*"
       ],
       "standardFlowEnabled": true,
-      "directAccessGrantsEnabled": true
+      "directAccessGrantsEnabled": true,
+      "attributes": {
+        "pkce.code.challenge.method": "S256"
+      }
+    }
+  ],
+  "identityProviders": [
+    {
+      "alias": "google",
+      "displayName": "Google",
+      "providerId": "google",
+      "enabled": true,
+      "trustEmail": true,
+      "storeToken": false,
+      "addReadTokenRoleOnCreate": false,
+      "firstBrokerLoginFlowAlias": "first broker login",
+      "config": {
+        "clientId": "REPLACE_WITH_GOOGLE_OAUTH_CLIENT_ID",
+        "clientSecret": "REPLACE_WITH_GOOGLE_OAUTH_CLIENT_SECRET",
+        "syncMode": "IMPORT",
+        "useJwksUrl": "true"
+      }
     }
   ],
   "users": [

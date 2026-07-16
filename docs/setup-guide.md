@@ -94,16 +94,21 @@ Create the directory and copy your pre-configured realm settings to:
 This file automatically provisions:
 * **Realm**: `careerflow-realm`
 * **Roles**: `CANDIDATE`, `ADMIN`
+* **Self-registration**: enabled (`registrationAllowed: true`), email-as-username, self-service password reset, a minimal password policy (`length(8) and notUsername`)
+* **Default group**: every newly created user (via registration or Google) is placed in `/candidates`, which maps to realm role `CANDIDATE` — new users never get `ADMIN` by default
+* **Google Identity Provider**: pre-configured with `providerId: google`, but ships with **placeholder** `clientId`/`clientSecret` (`REPLACE_WITH_GOOGLE_OAUTH_CLIENT_ID`/`_SECRET`). Google login will not work until you replace these with real credentials from [Google Cloud Console](https://console.cloud.google.com/apis/credentials) — either edit them via the Keycloak Admin Console after import (recommended, avoids committing secrets) or in a local, untracked copy of `realm-export.json`
 * **OAuth2 Client**: `careerflow-api-gateway`
   - Access Type: Public
   - Standard Flow Enabled: Yes (Authorization Code Flow)
   - Direct Access Grants Enabled: Yes (for Postman resource-owner password grant testing)
   - Redirect URIs: `http://localhost:8080/*`, `https://oauth.pstmn.io/v1/callback`
-  - Proof Key for Code Exchange (PKCE): Required
+  - Proof Key for Code Exchange (PKCE): Required (`pkce.code.challenge.method: S256`)
 * **Default Demo User**:
   - Username: `candidate@careerflow.com`
   - Password: `password`
   - Assigned Realm Role: `CANDIDATE`
+
+**Local dev note:** `verifyEmail` is `false` because no SMTP server is configured in `docker-compose.yml`. Do not open registration to the public internet without configuring SMTP and setting `verifyEmail: true`.
 
 ---
 

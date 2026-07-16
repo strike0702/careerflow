@@ -126,6 +126,10 @@ The React SPA lives in `frontend/` and communicates **only** with the API Gatewa
 | Keycloak client | `careerflow-api-gateway` (Authorization Code + PKCE) |
 | Demo user | `candidate@careerflow.com` / `password` |
 
+Unauthenticated visitors land on a CareerFlow welcome screen (`AuthLanding`) with **Sign In** and **Create Account** buttons — both redirect to Keycloak's hosted pages (`keycloak.login()` / `keycloak.register()`); the SPA has no custom auth form. New accounts (via registration or Google) automatically receive the `CANDIDATE` role.
+
+After first login, if the candidate profile has no target role or no skill yet, the dashboard shows a dismissible **Complete your profile** banner with a link to `/profile`. The rest of the app stays accessible. See [architecture.md](./architecture.md#frontend-profile-completion-nudge) and [ADR-008](./decisions/ADR-008-self-service-registration-and-onboarding.md).
+
 ```bash
 cd frontend
 cp .env.example .env.development

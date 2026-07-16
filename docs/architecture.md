@@ -129,6 +129,41 @@ sequenceDiagram
     Service-->>Client: Authorized response
 ```
 
+### Registration and social login
+
+Self-registration and Google login are handled entirely by Keycloak's hosted pages; the SPA never collects a password or talks to Google directly.
+
+```mermaid
+sequenceDiagram
+    participant SPA
+    participant Keycloak
+    participant Google
+    participant US as User Service
+
+    SPA->>Keycloak: keycloak.register() / keycloak.login()
+    Keycloak->>SPA: Hosted registration/login page<br/>(includes "Sign in with Google")
+    opt Google chosen
+        Keycloak->>Google: OIDC broker redirect
+        Google-->>Keycloak: Identity confirmed
+    end
+    Note over Keycloak: New user added to<br/>default group "/candidates" → role CANDIDATE
+    Keycloak-->>SPA: Redirect back with access_token (JWT)
+    SPA->>US: GET /api/v1/users/me
+    Note over US: getOrSyncUser — unchanged.<br/>Lazy-creates User + empty CandidateProfile
+    US-->>SPA: User DTO
+```
+
+Key points:
+
+- **Registration UI** is Keycloak's own page (`registrationAllowed: true` in `realm-export.json`), reached via `keycloak.register()` from the frontend's `AuthLanding` screen. No custom signup form exists in the SPA.
+- **Google Identity Brokering**: Keycloak is configured with a `google` identity provider (`infrastructure/keycloak/realm-export.json`). Users who sign in with Google still receive a standard Keycloak-issued JWT — no service-side changes were needed.
+- **Default role assignment**: every newly created user (via registration or Google) is placed in the `/candidates` default group, which maps to realm role `CANDIDATE`. This guarantees `getOrSyncUser` sees `CANDIDATE` in `realm_access.roles` on first sync, same as today.
+- **User/CandidateProfile sync is unchanged** — see Section 6 and [ADR-008](./decisions/ADR-008-self-service-registration-and-onboarding.md).
+
+### Frontend profile completion nudge
+
+After login, the dashboard may show a dismissible **Complete your profile** banner when the candidate profile has no target role or no skill yet. Users can dismiss the banner (stored per user in `localStorage`) or follow the link to `/profile`. The dashboard and rest of the app remain accessible regardless of profile completeness — no route gate is enforced. This is client-side only; no new backend endpoint or schema was introduced.
+
 ### Token claims used
 
 | Claim | Usage |
@@ -223,7 +258,7 @@ Flyway migrations: `V1__create_users.sql`, `V2__create_candidate_profiles.sql`
 
 **Planned:** Interview Service would expose an active interview count; Application Service would call it via Feign with forwarded JWT (see [technical-debt.md](./technical-debt.md)).
 
-**Planned:** Event-driven communication via Kafka for domain events (Phase 4).
+**Planned:** Event-driven communication via Kafka for domain events (Phase 5).
 
 ---
 

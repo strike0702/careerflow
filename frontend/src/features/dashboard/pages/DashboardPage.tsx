@@ -7,6 +7,7 @@ import { MetricCards } from '@/features/dashboard/components/MetricCards'
 import { RecentActivityFeed } from '@/features/dashboard/components/RecentActivityFeed'
 import { StatusChart } from '@/features/dashboard/components/StatusChart'
 import { useDashboard, useRecentActivities } from '@/features/dashboard/hooks/useDashboard'
+import { ProfileCompletionBanner } from '@/features/profile/components/ProfileCompletionBanner'
 import { ROUTES } from '@/routes/paths'
 
 export function DashboardPage() {
@@ -45,6 +46,8 @@ export function DashboardPage() {
           </Button>
         }
       />
+
+      <ProfileCompletionBanner />
 
       {isEmpty && !isLoading ? (
         <EmptyState

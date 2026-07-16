@@ -54,7 +54,7 @@ export function formatStatusLabel(status: ApplicationStatus): string {
 
 export function formatCurrency(
   value: number | null | undefined,
-  currency = 'USD',
+  currency = 'INR',
 ): string {
   if (value == null) return '—'
   return new Intl.NumberFormat(undefined, {

@@ -119,7 +119,7 @@ export function OfferForm({ offer, onSubmit, isSubmitting }: OfferFormProps) {
                   <FormLabel>Currency *</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="USD"
+                      placeholder="INR"
                       maxLength={3}
                       {...field}
                       onChange={(event) => field.onChange(event.target.value.toUpperCase())}

@@ -60,7 +60,34 @@ Goal: Make the existing services operable and consistent before adding new domai
 
 ---
 
-## Phase 4 — Event-Driven Architecture
+## ✅ Phase 4 — Frontend MVP
+
+**Status:** Complete
+
+- React SPA (dashboard, applications, profile) via Keycloak Authorization Code + PKCE
+- All API calls through API Gateway (`:9000`) with Axios interceptors
+- Dashboard with metrics, status chart, and activity feed
+- Applications list (filters, pagination), create, detail, status update, offer management
+- Candidate profile view and edit
+- Gateway CORS for `http://localhost:5173`; Vite `/api` dev proxy
+- TanStack Query, React Hook Form + Zod, shadcn/ui, Recharts, next-themes
+
+---
+
+## ✅ Phase 4.1 — Self-Service Registration & Onboarding
+
+**Status:** Complete
+
+- Keycloak self-registration + Google Identity Provider (brokering); new users auto-assigned `CANDIDATE` via a default group
+- Frontend landing screen with Sign In / Create Account (`AuthLanding`), replacing unconditional auto-redirect to login
+- Profile completion banner on dashboard (dismissible nudge to `/profile`); no route gate
+- No backend changes — lazy `User`/`CandidateProfile` sync unchanged (see [ADR-008](./decisions/ADR-008-self-service-registration-and-onboarding.md))
+
+**Deferred:** SMTP + `verifyEmail: true` (required before public/non-local deployment); real Google OAuth credentials (realm export ships with placeholders).
+
+---
+
+## Phase 5 — Event-Driven Architecture
 
 **Status:** Planned
 
@@ -77,7 +104,7 @@ Goal: Decouple side effects and enable notifications.
 
 ---
 
-## Phase 5 — Resume Management
+## Phase 6 — Resume Management
 
 **Status:** Planned
 
@@ -97,7 +124,7 @@ Goal: Implement the resume bounded context and enrich application tracking.
 
 ---
 
-## Phase 6 — Deployment
+## Phase 7 — Deployment
 
 **Status:** Planned
 
@@ -118,7 +145,7 @@ Goal: Repeatable builds, automated testing, cloud-ready deployment.
 
 These are mentioned in design docs but not committed to a phase:
 
-- Frontend / mobile client
+- Mobile client
 - Analytics warehouse
 - Full-text search (Elasticsearch)
 - Multi-tenant organization support
@@ -129,7 +156,8 @@ These are mentioned in design docs but not committed to a phase:
 ## How to Use This Roadmap
 
 1. Complete Phase 3 before starting Kafka or new services — it reduces carry-forward debt.
-2. Each phase should end with updated docs in `docs/project-status.md` and Bruno collections.
-3. ADRs in `docs/decisions/` should be added when significant architectural choices are made in future phases.
+2. Phases 4 and 4.1 deliver the SPA and self-service auth; Phase 5+ adds new backend domains.
+3. Each phase should end with updated docs in `docs/project-status.md` and Bruno collections.
+4. ADRs in `docs/decisions/` should be added when significant architectural choices are made in future phases.
 
 See also: [technical-debt.md](./technical-debt.md), [project-status.md](./project-status.md).
