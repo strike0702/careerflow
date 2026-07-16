@@ -1,0 +1,31 @@
+---
+description: CareerFlow engineering principles
+alwaysApply: true
+---
+
+CareerFlow prioritizes production-style architecture over academic complexity.
+
+Follow these principles:
+
+- Backend-first engineering.
+- Readability over cleverness.
+- Explicit code over framework magic.
+- Thin controllers.
+- Business logic belongs in services.
+- Repository layer only performs persistence.
+- One microservice owns one database.
+- JWT subject (sub) is the ownership boundary.
+- Never trust user IDs supplied by clients.
+- Prefer value objects over unnecessary entities.
+- Avoid bidirectional JPA relationships.
+- Flyway owns schema evolution.
+- Hibernate validates schemas only.
+- Feature-based packaging.
+- Constructor injection only.
+- DTOs for all API boundaries.
+- Use UTC timestamps.
+- Use BigDecimal for monetary values.
+- Avoid unnecessary abstractions.
+- Optimize for maintainability rather than cleverness.
+
+When multiple designs are possible, recommend the simplest production-quality solution.

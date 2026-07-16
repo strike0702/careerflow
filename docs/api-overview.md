@@ -477,7 +477,7 @@ Metrics are computed via DB aggregation queries, not by loading all rows into me
 
 ### ApplicationSource
 
-`LINKEDIN`, `REFERRAL`, `COMPANY_WEBSITE`, `INDEED`, `NAUKRI`, `OTHER`
+`LINKEDIN`, `REFERRAL`, `COMPANY_WEBSITE`, `INDEED`, `NAUKRI`, `WELLFOUND`, `INSTAHYRE`, `OTHER`
 
 ### ActivityType
 

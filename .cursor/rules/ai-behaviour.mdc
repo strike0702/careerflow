@@ -1,0 +1,36 @@
+---
+alwaysApply: true
+---
+Before writing code:
+
+1. Read the relevant project documentation.
+2. Summarize your understanding.
+3. Identify missing information or inconsistencies.
+4. Propose an implementation plan.
+5. Wait for approval before making architectural or database changes.
+
+Never assume requirements.
+
+If implementation, documentation, or architecture conflict:
+
+- Explain the conflict.
+- Recommend the best approach.
+- Wait for approval.
+
+Never silently:
+
+- Rename APIs
+- Modify database schemas
+- Change authentication flows
+- Introduce breaking changes
+
+When implementation is complete:
+
+- Build the affected modules.
+- Fix compilation issues.
+- Review the implementation for correctness, maintainability, and security.
+- Add or update tests where appropriate.
+- Update documentation if behavior changed.
+- Suggest a concise Conventional Commit message.
+
+Prefer explicit explanations over hidden assumptions.

@@ -92,6 +92,7 @@ CareerFlow/
 │   ├── postgres/init.sql             # Logical database bootstrap
 │   └── keycloak/realm-export.json    # Realm, roles, demo users
 ├── bruno/                            # API test collection
+├── frontend/                         # React SPA (Vite, port 5173)
 └── docs/
     ├── project-status.md             # Current implementation status
     ├── architecture.md               # System architecture
@@ -123,6 +124,7 @@ CareerFlow/
 - **Flyway migrations** for application-service and user-service schema
 - **Observability:** correlation IDs, structured logging, Prometheus metrics, health probes
 - **Bruno collection** for manual API testing
+- **Frontend (React SPA):** Keycloak login, dashboard, applications, profile — via API Gateway only
 
 ### Planned
 
@@ -163,6 +165,7 @@ Obtain a token with Bruno: **Auth → Get Candidate Token**, then paste the `acc
 ### Prerequisites
 
 - JDK 21
+- Node.js 20+ and npm
 - Docker & Docker Compose v2
 
 ### 1. Start infrastructure
@@ -208,6 +211,24 @@ cd backend
 ```
 
 See [docs/setup-guide.md](docs/setup-guide.md) and [docs/local-development.md](docs/local-development.md) for additional setup notes.
+
+### 4. Start the frontend
+
+```bash
+cd frontend
+cp .env.example .env.development   # if not already present
+npm install
+npm run dev
+```
+
+| App | URL |
+|-----|-----|
+| Frontend | `http://localhost:5173` |
+| API (via Vite proxy) | `http://localhost:5173/api/v1/**` → gateway `:9000` |
+
+Demo login: `candidate@careerflow.com` / `password`
+
+The frontend uses Keycloak Authorization Code + PKCE and sends all API requests through the gateway (never to individual services directly).
 
 ---
 
@@ -315,9 +336,9 @@ Full schemas: [docs/api-overview.md](docs/api-overview.md)
 
 ## Screenshots
 
-<!-- Placeholder: add UI screenshots here when a frontend is built -->
+<!-- Placeholder: add UI screenshots here -->
 
-No frontend is implemented yet. API testing is done via Bruno or any HTTP client.
+The frontend provides a dashboard, application management, and candidate profile UI at `http://localhost:5173`.
 
 ---
 

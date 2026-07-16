@@ -1,0 +1,19 @@
+---
+globs: README.md,docs/**,bruno/**
+alwaysApply: false
+---
+Whenever implementation changes:
+
+Update:
+
+- project-status.md
+- roadmap.md
+- architecture.md
+- API documentation
+- Bruno collections if endpoints changed
+
+When architecture changes significantly:
+
+- Add or update an ADR.
+
+Documentation should always reflect the implemented system rather than future plans.

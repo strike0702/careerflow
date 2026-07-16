@@ -43,6 +43,7 @@ Clients authenticate with Keycloak, call the API Gateway with a JWT, and each do
 | Resume Service | **Planned** |
 | Interview Service | **Planned** |
 | Shared observability module | **Completed** |
+| Frontend (React SPA) | **Completed** |
 | CI/CD | **Planned** |
 | Event-driven architecture (Kafka) | **Planned** |
 
@@ -85,6 +86,17 @@ Clients authenticate with Keycloak, call the API Gateway with a JWT, and each do
 - ADR-007: Correlation ID propagation
 
 **Deferred:** Shared security module extraction and `@PreAuthorize` (intentionally postponed).
+
+### Phase 4 — Frontend MVP ✅
+
+- React + TypeScript + Vite SPA in `frontend/`
+- Keycloak Authorization Code + PKCE via `keycloak-js`
+- All API calls through API Gateway (`:9000`) with Axios interceptors
+- Dashboard with metrics, status chart, and activity feed
+- Applications list (filters, pagination), create, detail, status update, offer management
+- Candidate profile view and edit
+- Gateway CORS for `http://localhost:5173`; Vite `/api` dev proxy
+- TanStack Query, React Hook Form + Zod, shadcn/ui, Recharts, next-themes
 
 ---
 

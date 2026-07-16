@@ -1,0 +1,22 @@
+---
+description: Standard implementation workflow
+alwaysApply: true
+---
+
+For every feature:
+
+1. Read the relevant documentation.
+2. Summarize your understanding.
+3. Produce an implementation plan.
+4. Wait for approval when architecture changes.
+5. Implement only the approved scope.
+6. Build the affected modules.
+7. Fix compilation issues.
+8. Run tests.
+9. Review for security and quality.
+10. Update documentation.
+11. Suggest a Conventional Commit.
+
+Do not refactor unrelated code unless explicitly requested.
+
+Prefer small, reviewable commits.

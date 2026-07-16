@@ -1,4 +1,4 @@
-# CareerFlow Local Development Guide
+ # CareerFlow Local Development Guide
 
 This document outlines configurations, properties, and run instructions for building, running, and testing CareerFlow microservices locally.
 
@@ -14,6 +14,7 @@ CareerFlow/
 │   ├── user-service/           # Port 8081
 │   └── application-service/    # Port 8083
 ├── infrastructure/             # Docker Compose (PostgreSQL + Keycloak)
+├── frontend/                   # React SPA (Vite, port 5173)
 ├── bruno/                      # API test collection
 └── docs/
 ```
@@ -114,7 +115,45 @@ If your local `careerflow_user` database already has tables created by Hibernate
 
 ---
 
-## 8. Troubleshooting
+## 9. Frontend Development
+
+The React SPA lives in `frontend/` and communicates **only** with the API Gateway.
+
+| Item | Value |
+|------|-------|
+| Dev server | `http://localhost:5173` |
+| Vite proxy | `/api` → `http://localhost:9000` |
+| Keycloak client | `careerflow-api-gateway` (Authorization Code + PKCE) |
+| Demo user | `candidate@careerflow.com` / `password` |
+
+```bash
+cd frontend
+cp .env.example .env.development
+npm install
+npm run dev
+```
+
+Environment variables (`frontend/.env.development`):
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `VITE_KEYCLOAK_URL` | `http://localhost:8080` | Keycloak base URL |
+| `VITE_KEYCLOAK_REALM` | `careerflow-realm` | Realm name |
+| `VITE_KEYCLOAK_CLIENT_ID` | `careerflow-api-gateway` | OAuth client |
+| `VITE_API_BASE_URL` | *(empty)* | Empty uses Vite `/api` proxy; set to gateway URL for direct calls |
+
+**CORS:** The API Gateway allows `http://localhost:5173`. Keycloak redirect URIs include `http://localhost:5173/*`.
+
+**Full stack startup order:**
+
+1. `cd infrastructure && docker compose up -d`
+2. Start backend services (gateway, user-service, application-service)
+3. `cd frontend && npm run dev`
+4. Open `http://localhost:5173` and sign in via Keycloak
+
+---
+
+## 10. Troubleshooting
 
 ### Token / JWKS errors
 

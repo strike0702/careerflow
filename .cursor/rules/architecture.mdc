@@ -1,0 +1,16 @@
+---
+globs: backend/**,docs/**
+alwaysApply: false
+---
+Architecture rules:
+
+- Follow Domain-Driven Design where appropriate.
+- Follow feature-based package organization.
+- Preserve service boundaries.
+- Never access another service's database.
+- Services communicate through APIs or domain events.
+- Keep aggregate boundaries small.
+- Prefer immutable DTOs.
+- Keep business logic independent of controllers.
+- Significant architectural decisions require an ADR.
+- Do not introduce distributed-system complexity without clear value.

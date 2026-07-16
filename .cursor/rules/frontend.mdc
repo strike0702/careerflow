@@ -1,0 +1,34 @@
+---
+globs: frontend/**
+alwaysApply: false
+---
+Technology stack:
+
+- React
+- TypeScript
+- Vite
+- TailwindCSS
+- shadcn/ui
+- TanStack Query
+- React Hook Form
+- Zod
+- Axios
+- Keycloak JS
+
+Guidelines:
+
+- Feature-based folder structure.
+- Components should remain small.
+- Prefer composition over prop drilling.
+- Keep business logic inside hooks/services.
+- Use TanStack Query for server state.
+- Use local state only for UI concerns.
+- Validate forms with Zod.
+- Reuse UI components.
+- Support loading, empty, and error states.
+- Keep pages responsive.
+- Support dark mode.
+
+All API communication must go through the API Gateway.
+
+Never call backend microservices directly.
