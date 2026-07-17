@@ -30,3 +30,9 @@ application-local.yml
 application-local.yaml
 application-secrets.yml
 application-secrets.yaml
+
+# Caveman AI tooling (local install via npx skills add / install.sh --with-init)
+.agents/
+skills-lock.json
+.cursor/rules/caveman.mdc
+AGENTS.md
