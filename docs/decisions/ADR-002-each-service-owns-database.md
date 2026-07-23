@@ -45,4 +45,4 @@ Services must not read or write another service's tables. Cross-service data is 
 **Follow-up:**
 
 - Implement Resume and Interview services with their own databases (Phase 6)
-- Consider saga/outbox patterns when cross-service transactions are needed (Phase 5)
+- Consider saga/outbox patterns when cross-service transactions are needed (Phase 5) — **outbox implemented** in Application Service ([ADR-009](./ADR-009-kafka-event-driven-architecture.md))

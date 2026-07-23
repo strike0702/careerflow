@@ -87,40 +87,46 @@ Goal: Make the existing services operable and consistent before adding new domai
 
 ---
 
-## Phase 5 — Event-Driven Architecture
+## ✅ Phase 5 — Event-Driven Architecture
 
-**Status:** Planned
+**Status:** Complete
 
 Goal: Decouple side effects and enable notifications.
 
-| Item | Description |
-|------|-------------|
-| Kafka | Local Docker Compose broker; Spring Kafka producers/consumers |
-| Domain events | `ApplicationCreated`, `StatusChanged`, `OfferAdded`, etc. |
-| Notification Service | Consume events; email/in-app notifications (initial stub) |
-| Event schema | Avro or JSON schema registry (start simple) |
+| Item | Status |
+|------|--------|
+| Kafka | ✅ KRaft broker in Docker Compose; Spring Kafka producers/consumers |
+| Domain events | ✅ `ApplicationCreated`, `ApplicationStatusChanged`, `OfferAdded`, `OfferUpdated` |
+| Transactional outbox | ✅ Application Service outbox table + poller |
+| Notification Service | ✅ Consumes events; stub logging; idempotent `processed_events` |
+| Event schema | ✅ Versioned JSON envelope ([ADR-009](./decisions/ADR-009-kafka-event-driven-architecture.md)) |
+| Reliability | ✅ Consumer retries + DLT; outbox retry/failed state; Micrometer counters |
 
-**Prerequisite:** Phase 3 observability (correlation IDs, error handling).
+**Deferred:** Avro/Schema Registry, SMTP/email delivery, in-app notification inbox API.
 
 ---
 
-## Phase 6 — Resume Management
+## Phase 6 — Resume & Interview Management
 
-**Status:** Planned
+**Status:** Complete
 
-Goal: Implement the resume bounded context and enrich application tracking.
+Goal: Implement resume and interview bounded contexts and enrich application tracking.
 
-| Item | Description |
-|------|-------------|
-| Resume Service | Gradle module on port 8082 |
-| Flyway migrations | `careerflow_resume` schema |
-| CRUD APIs | Register, list, delete resume versions |
-| File storage | Metadata + mock/real object storage URL |
-| Interview Service | Schedule rounds, post-interview retros |
-| Feign integration | Dashboard pulls active interview count from Interview Service |
-| Application ↔ Resume link | Optional `resumeId` on applications (requires design decision) |
+| Item | Status |
+|------|--------|
+| Resume Service | ✅ Gradle module on port 8082 |
+| Flyway migrations | ✅ `careerflow_resume` — `resumes`, `outbox_events` |
+| Resume CRUD APIs | ✅ Register, list, update, delete, set primary |
+| File storage | ✅ Metadata + mock local storage URL |
+| Interview Service | ✅ Gradle module on port 8084 |
+| Interview CRUD + retros | ✅ Schedule, update, status/outcome, retrospective, stats |
+| OpenFeign integration | ✅ Interview→Application validation; Application→Resume validation |
+| Application ↔ Resume link | ✅ Optional `resumeId` on applications (Flyway V5) |
+| Domain events | ✅ Outbox + Kafka for ResumeUploaded/Deleted, InterviewScheduled/Completed |
+| Frontend | ✅ Resumes page, interview tab on application detail, dashboard merge |
+| ADRs | ✅ ADR-010 (bounded contexts), ADR-011 (OpenFeign) |
 
-**Note:** Gateway routes for `/api/v1/resumes/**` and `/api/v1/interviews/**` already exist.
+**Deferred:** Real object storage (S3), resume parsing, notification consumption of resume/interview events.
 
 ---
 

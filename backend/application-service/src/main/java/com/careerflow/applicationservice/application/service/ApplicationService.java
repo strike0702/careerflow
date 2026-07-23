@@ -11,6 +11,7 @@ import com.careerflow.applicationservice.application.model.ReferralInfo;
 import com.careerflow.applicationservice.application.repository.ApplicationRepository;
 import com.careerflow.applicationservice.activity.model.Activity;
 import com.careerflow.applicationservice.offer.model.Offer;
+import com.careerflow.applicationservice.events.outbox.OutboxWriter;
 import com.careerflow.applicationservice.offer.service.OfferService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -38,20 +39,28 @@ public class ApplicationService {
     private final ApplicationAccessService applicationAccessService;
     private final ActivityService activityService;
     private final OfferService offerService;
+    private final OutboxWriter outboxWriter;
+    private final ResumeValidationService resumeValidationService;
 
     public ApplicationService(
         ApplicationRepository applicationRepository,
         ApplicationAccessService applicationAccessService,
         ActivityService activityService,
-        OfferService offerService
+        OfferService offerService,
+        OutboxWriter outboxWriter,
+        ResumeValidationService resumeValidationService
     ) {
         this.applicationRepository = applicationRepository;
         this.applicationAccessService = applicationAccessService;
         this.activityService = activityService;
         this.offerService = offerService;
+        this.outboxWriter = outboxWriter;
+        this.resumeValidationService = resumeValidationService;
     }
 
     public Application createApplication(String userId, CreateApplicationRequest request) {
+        resumeValidationService.validateResumeOwnership(request.resumeId());
+
         Application application = new Application();
         application.setUserId(userId);
         application.setCompanyName(request.companyName());
@@ -62,6 +71,7 @@ public class ApplicationService {
         application.setStatus(request.status() != null ? request.status() : ApplicationStatus.WISHLIST);
         application.setApplicationDate(request.applicationDate());
         application.setNotes(request.notes());
+        application.setResumeId(request.resumeId());
         application.setReferralInfo(mapReferralInfo(request.referralInfo()));
 
         Application saved = applicationRepository.save(application);
@@ -72,6 +82,8 @@ public class ApplicationService {
             ActivityType.APPLICATION_CREATED,
             "Application created for " + saved.getCompanyName() + " - " + saved.getJobTitle()
         );
+
+        outboxWriter.writeApplicationCreated(saved, userId);
 
         return saved;
     }
@@ -130,6 +142,8 @@ public class ApplicationService {
             "Status changed from " + previousStatus + " to " + newStatus
                 + " for " + application.getCompanyName() + " - " + application.getJobTitle()
         );
+
+        outboxWriter.writeApplicationStatusChanged(saved, previousStatus, userId);
 
         return saved;
     }

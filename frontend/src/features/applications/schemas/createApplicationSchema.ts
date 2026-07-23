@@ -32,6 +32,7 @@ export const createApplicationSchema = z
     status: z.enum(applicationStatuses),
     applicationDate: z.string().optional(),
     notes: z.string().optional(),
+    resumeId: z.string().optional(),
     referred: z.boolean(),
     referrerName: z.string().optional(),
     referrerCompanyEmail: z

@@ -1,0 +1,26 @@
+info:
+  name: Schedule Interview
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: http://localhost:8084/api/v1/interviews
+  auth: inherit
+  body:
+    type: json
+    data: |-
+      {
+        "applicationId": "{{applicationId}}",
+        "roundType": "TECHNICAL",
+        "mode": "REMOTE",
+        "scheduledAt": "2026-08-01T14:00:00Z",
+        "title": "System design round",
+        "durationMinutes": 60
+      }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

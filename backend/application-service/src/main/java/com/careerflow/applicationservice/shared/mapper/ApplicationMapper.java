@@ -39,6 +39,7 @@ public class ApplicationMapper {
             application.getStatus(),
             application.getApplicationDate(),
             application.getNotes(),
+            application.getResumeId(),
             toReferralResponse(application.getReferralInfo()),
             application.getCreatedAt(),
             application.getUpdatedAt(),

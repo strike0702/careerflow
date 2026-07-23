@@ -10,10 +10,14 @@ This document outlines configurations, properties, and run instructions for buil
 CareerFlow/
 ├── backend/
 │   ├── shared-common/          # Correlation IDs, logging, shared exception handling
+│   ├── shared-events/          # Versioned JSON domain event contracts
 │   ├── api-gateway/            # Port 9000
 │   ├── user-service/           # Port 8081
-│   └── application-service/    # Port 8083
-├── infrastructure/             # Docker Compose (PostgreSQL + Keycloak)
+│   ├── application-service/    # Port 8083
+│   ├── resume-service/         # Port 8082
+│   ├── interview-service/      # Port 8084
+│   └── notification-service/   # Port 8085
+├── infrastructure/             # Docker Compose (PostgreSQL + Keycloak + Kafka)
 ├── frontend/                   # React SPA (Vite, port 5173)
 ├── bruno/                      # API test collection
 └── docs/
@@ -40,8 +44,10 @@ All services support externalized configuration via environment variables:
 | Variable | Used by | Default |
 |----------|---------|---------|
 | `SPRING_PROFILES_ACTIVE` | All | `dev` |
-| `SERVER_PORT` | All | Service-specific (9000, 8081, 8083) |
-| `DATABASE_URL` | user-service, application-service | `jdbc:postgresql://localhost:5432/careerflow_*` |
+| `SERVER_PORT` | All | Service-specific (9000, 8081–8085) |
+| `DATABASE_URL` | Business services | `jdbc:postgresql://localhost:5432/careerflow_*` |
+| `RESUME_SERVICE_URL` | application-service | `http://localhost:8082` |
+| `APPLICATION_SERVICE_URL` | interview-service | `http://localhost:8083` |
 | `DATABASE_USERNAME` | user-service, application-service | `postgres` |
 | `DATABASE_PASSWORD` | user-service, application-service | `password` |
 | `KEYCLOAK_JWK_SET_URI` | user-service, application-service | Keycloak JWKS on `localhost:8080` |
@@ -49,6 +55,7 @@ All services support externalized configuration via environment variables:
 | `APPLICATION_SERVICE_URI` | api-gateway | `http://localhost:8083` |
 | `RESUME_SERVICE_URI` | api-gateway | `http://localhost:8082` |
 | `INTERVIEW_SERVICE_URI` | api-gateway | `http://localhost:8084` |
+| `KAFKA_BOOTSTRAP_SERVERS` | application-service, notification-service | `localhost:9092` |
 
 Example — run user-service against a custom database:
 
@@ -99,13 +106,39 @@ cd backend && ./gradlew clean build
 ./gradlew :api-gateway:bootRun
 ./gradlew :user-service:bootRun
 ./gradlew :application-service:bootRun
+./gradlew :resume-service:bootRun
+./gradlew :interview-service:bootRun
+./gradlew :notification-service:bootRun
 ```
 
 Run tests:
 
 ```bash
-./gradlew :application-service:test :user-service:test
+./gradlew :application-service:test :user-service:test :resume-service:test :interview-service:test :notification-service:test
 ```
+
+---
+
+## 8. Kafka (Phase 5)
+
+Kafka starts with infrastructure:
+
+```bash
+cd infrastructure && docker compose up -d
+```
+
+| Component | URL |
+|-----------|-----|
+| Kafka broker | `localhost:9092` |
+| Kafka UI | `http://localhost:8086` |
+
+**Existing Postgres volume:** if `careerflow_notification` DB missing, create manually:
+
+```bash
+docker exec -it careerflow-postgres psql -U postgres -c "CREATE DATABASE careerflow_notification;"
+```
+
+**Verify event flow:** create application via API, check notification-service logs for `action=would_notify`. Kafka UI shows messages on `careerflow.application.events`.
 
 ---
 
@@ -151,7 +184,7 @@ Environment variables (`frontend/.env.development`):
 **Full stack startup order:**
 
 1. `cd infrastructure && docker compose up -d`
-2. Start backend services (gateway, user-service, application-service)
+2. Start backend services (gateway, user-service, application-service, notification-service)
 3. `cd frontend && npm run dev`
 4. Open `http://localhost:5173` and sign in via Keycloak
 

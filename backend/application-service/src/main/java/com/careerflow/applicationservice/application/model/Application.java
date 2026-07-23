@@ -60,6 +60,9 @@ public class Application {
     @Embedded
     private ReferralInfo referralInfo;
 
+    @Column(name = "resume_id")
+    private UUID resumeId;
+
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 

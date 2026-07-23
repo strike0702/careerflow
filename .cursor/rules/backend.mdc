@@ -1,3 +1,33 @@
 ---
-alwaysApply: true
+globs: backend/**
+alwaysApply: false
 ---
+Use:
+
+- Spring Boot 3.x
+- Java 21
+- Constructor injection
+- Bean Validation
+- ProblemDetail
+- Spring Data JPA
+- Flyway
+- PostgreSQL
+
+Prefer:
+
+- Java records for DTOs
+- Explicit transaction boundaries
+- Optimistic locking where appropriate
+
+Avoid:
+
+- Field injection
+- Static mutable state
+- Business logic in controllers
+- Returning JPA entities from APIs
+
+Every schema change requires a Flyway migration.
+
+Add tests for new business logic whenever practical.
+
+When running Gradle, never set `GRADLE_USER_HOME` inside the repo (e.g. `.gradle-home/`). Use the default user cache (`~/.gradle`) or request full permissions if the sandbox blocks it.

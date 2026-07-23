@@ -1,4 +1,4 @@
-import { Briefcase, LayoutDashboard, Menu, Moon, Sun, User } from 'lucide-react'
+import { Briefcase, FileText, LayoutDashboard, Menu, Moon, Sun, User } from 'lucide-react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { useTheme } from 'next-themes'
 import { useState } from 'react'
@@ -11,6 +11,7 @@ import { UserMenu } from '@/components/layout/UserMenu'
 const navItems = [
   { to: ROUTES.dashboard, label: 'Dashboard', icon: LayoutDashboard },
   { to: ROUTES.applications, label: 'Applications', icon: Briefcase },
+  { to: ROUTES.resumes, label: 'Resumes', icon: FileText },
   { to: ROUTES.profile, label: 'Profile', icon: User },
 ]
 

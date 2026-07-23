@@ -22,24 +22,35 @@ graph TB
     subgraph Infrastructure["Infrastructure (Docker Compose)"]
         KC[Keycloak<br/>:8080]
         PG[(PostgreSQL<br/>:5432)]
+        KF[Kafka<br/>:9092]
     end
 
     subgraph Backend["Backend (Gradle Monorepo)"]
         GW[API Gateway<br/>:9000]
         US[User Service<br/>:8081]
         AS[Application Service<br/>:8083]
+        RS[Resume Service<br/>:8082]
+        IS[Interview Service<br/>:8084]
+        NS[Notification Service<br/>:8085]
     end
 
     Client -->|OAuth2 token| KC
     Client -->|REST + JWT| GW
     GW --> US
     GW --> AS
+    GW --> RS
+    GW --> IS
     US -->|careerflow_user| PG
     AS -->|careerflow_application| PG
+    RS -->|careerflow_resume| PG
+    IS -->|careerflow_interview| PG
+    NS -->|careerflow_notification| PG
+    AS -->|outbox publish| KF
+    RS -->|outbox publish| KF
+    IS -->|outbox publish| KF
+    KF -->|consume| NS
     KC -->|keycloak_db| PG
 ```
-
-**Planned but not implemented:** Resume Service (`:8082`), Interview Service (`:8084`). Gateway routes for these paths exist; backends do not.
 
 ---
 
@@ -50,7 +61,8 @@ Each service owns a bounded context and its database. Services do not share tabl
 | Service | Responsibility | Does NOT own |
 |---------|----------------|--------------|
 | **User Service** | User records synced from Keycloak; candidate profiles (target roles, salary range, skills) | Job applications, offers, interviews |
-| **Application Service** | Job applications, embedded referral info, offers, activity log, dashboard metrics | User email, name, profile details |
+| **Application Service** | Job applications, embedded referral info, offers, activity log, dashboard metrics, domain event outbox | User email, name, profile details |
+| **Notification Service** | Consumes application domain events; idempotent processing; stub notifications | Applications, user profiles, email delivery (deferred) |
 | **API Gateway** | Path-based routing, JWT passthrough | Business logic, authentication |
 
 ### Application Service internal structure
@@ -62,6 +74,7 @@ application-service/
 ├── application/   web, service, repository, model, dto
 ├── offer/         web, service, repository, model, dto
 ├── activity/      web, service, repository, model, dto
+├── events/        outbox, publisher, mapping
 └── shared/        security, exception, mapper
 ```
 
@@ -228,6 +241,7 @@ PostgreSQL :5432
 ├── careerflow_application → Application Service (Flyway)
 ├── careerflow_resume      → Planned
 ├── careerflow_interview   → Planned
+├── careerflow_notification → Notification Service (Flyway)
 └── keycloak_db            → Keycloak
 ```
 
@@ -251,14 +265,39 @@ Flyway migrations: `V1__create_users.sql`, `V2__create_candidate_profiles.sql`
 
 ## 8. Communication Between Services
 
-**Current:** No synchronous inter-service calls are implemented.
+**Synchronous:** No inter-service HTTP calls are implemented.
 
 - Application Service dashboard computes `activeInterviews` from application status (`INTERVIEWING`), not from Interview Service.
 - No OpenFeign clients exist in the codebase.
 
-**Planned:** Interview Service would expose an active interview count; Application Service would call it via Feign with forwarded JWT (see [technical-debt.md](./technical-debt.md)).
+**Asynchronous (Phase 5):** Application Service publishes domain events to Kafka via a **transactional outbox**. Notification Service consumes events and logs stub notifications (email/in-app deferred).
 
-**Planned:** Event-driven communication via Kafka for domain events (Phase 5).
+```mermaid
+sequenceDiagram
+    participant Client
+    participant AppSvc as Application Service
+    participant DB as careerflow_application
+    participant Outbox as Outbox Poller
+    participant Kafka as Kafka
+    participant Notif as Notification Service
+
+    Client->>AppSvc: POST /applications
+    AppSvc->>DB: INSERT application + activity + outbox (same TX)
+    AppSvc-->>Client: HTTP 201
+    Outbox->>DB: SELECT pending outbox rows
+    Outbox->>Kafka: publish JSON envelope
+    Kafka->>Notif: consume event
+    Notif->>Notif: idempotency check + stub log
+```
+
+| Topic | Purpose |
+|-------|---------|
+| `careerflow.application.events` | Application domain events |
+| `careerflow.application.events.DLT` | Poison messages after retry exhaustion |
+
+Events carry `X-Request-ID` in metadata and Kafka headers for log correlation across hops. See [ADR-009](./decisions/ADR-009-kafka-event-driven-architecture.md).
+
+**Planned:** Interview Service active interview count via Feign; Resume Service integration (Phase 6).
 
 ---
 

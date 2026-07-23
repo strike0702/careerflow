@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ActivityTimeline } from '@/features/applications/components/ActivityTimeline'
+import { InterviewPanel } from '@/features/interviews/components/InterviewPanel'
 import { OfferForm } from '@/features/applications/components/OfferForm'
 import { StatusBadge } from '@/features/applications/components/StatusBadge'
 import { StatusUpdateDialog } from '@/features/applications/components/StatusUpdateDialog'
@@ -17,6 +18,7 @@ import {
   useApplicationDetail,
   useApplicationMutations,
 } from '@/features/applications/hooks/useApplications'
+import { useResumes } from '@/features/resumes/hooks/useResumes'
 import { APPLICATION_SOURCE_LABELS, OFFER_STATUS_LABELS } from '@/lib/constants'
 import { formatCurrency, formatDate, formatDateTime } from '@/lib/formatters'
 import { ROUTES } from '@/routes/paths'
@@ -29,6 +31,7 @@ export function ApplicationDetailPage() {
   const [statusDialogOpen, setStatusDialogOpen] = useState(false)
 
   const { data, isLoading, isError, error, refetch } = useApplicationDetail(id)
+  const { data: resumes = [] } = useResumes()
   const { updateStatusMutation, upsertOfferMutation } = useApplicationMutations()
 
   if (isLoading) {
@@ -60,6 +63,9 @@ export function ApplicationDetailPage() {
   }
 
   const { application, offer, recentActivities } = data
+  const linkedResume = application.resumeId
+    ? resumes.find((resume) => resume.id === application.resumeId)
+    : undefined
 
   const handleStatusUpdate = async (status: ApplicationStatus) => {
     try {
@@ -106,6 +112,7 @@ export function ApplicationDetailPage() {
       <Tabs defaultValue="overview">
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="interviews">Interviews</TabsTrigger>
           <TabsTrigger value="offer">Offer</TabsTrigger>
           <TabsTrigger value="activity">Activity</TabsTrigger>
         </TabsList>
@@ -127,6 +134,23 @@ export function ApplicationDetailPage() {
                 <StatusBadge status={application.status} />
               </DetailField>
               <DetailField label="Application Date" value={formatDate(application.applicationDate)} />
+              <DetailField label="Resume">
+                {linkedResume ? (
+                  <a
+                    href={linkedResume.storageUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-primary hover:underline"
+                  >
+                    {linkedResume.label} (v{linkedResume.versionNo})
+                    <ExternalLink className="h-3.5 w-3.5" />
+                  </a>
+                ) : application.resumeId ? (
+                  application.resumeId
+                ) : (
+                  '—'
+                )}
+              </DetailField>
               <DetailField label="Created" value={formatDateTime(application.createdAt)} />
               <DetailField label="Last Updated" value={formatDateTime(application.updatedAt)} />
               <DetailField label="Job URL" className="sm:col-span-2">
@@ -167,6 +191,10 @@ export function ApplicationDetailPage() {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="interviews">
+          <InterviewPanel applicationId={application.id} />
         </TabsContent>
 
         <TabsContent value="offer" className="space-y-4">

@@ -33,30 +33,26 @@ This document tracks intentionally deferred work. Items here are known gaps—no
 
 ---
 
-### Event Publishing / Kafka
+### Event Publishing / Kafka — Implemented (Phase 5)
 
-**Why deferred:** Phase 2 is synchronous CRUD. No cross-service workflows require events yet.
+Transactional outbox in Application Service publishes to `careerflow.application.events`. See [ADR-009](./decisions/ADR-009-kafka-event-driven-architecture.md).
 
-**Benefits:**
+**Remaining:**
 
-- Decoupled notification delivery
-- Audit trail replication
-- Future analytics pipeline
-
-**Suggested phase:** Phase 5
+- Avro + Confluent Schema Registry
+- Analytics/event replication pipeline
 
 ---
 
-### Notification Service
+### Notification Service — Partially Implemented (Phase 5)
 
-**Why deferred:** No event infrastructure; no user-facing notification requirements in Phase 1–2.
+Stub consumer logs would-notify messages. No public REST API, no email/SMS.
 
-**Benefits:**
+**Remaining:**
 
-- Email/push on status changes, offer deadlines
-- Driven by domain events from application-service
-
-**Suggested phase:** Phase 5
+- SMTP/Mailhog integration
+- In-app notification inbox + gateway route
+- User email enrichment via User Service (async)
 
 ---
 

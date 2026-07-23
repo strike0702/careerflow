@@ -1,0 +1,15 @@
+info:
+  name: List Resumes
+  type: http
+  seq: 2
+
+http:
+  method: GET
+  url: http://localhost:8082/api/v1/resumes
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

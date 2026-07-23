@@ -8,11 +8,16 @@ import com.careerflow.applicationservice.application.dto.ReferralInfoRequest;
 import com.careerflow.applicationservice.application.model.Application;
 import com.careerflow.applicationservice.application.model.ApplicationSource;
 import com.careerflow.applicationservice.application.model.ApplicationStatus;
+import com.careerflow.applicationservice.events.outbox.OutboxEventRepository;
+import com.careerflow.applicationservice.events.outbox.OutboxEventStatus;
 import com.careerflow.applicationservice.application.repository.ApplicationRepository;
+import com.careerflow.applicationservice.shared.client.ResumeClient;
+import com.careerflow.events.EventTypes;
 import com.careerflow.common.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -28,9 +33,16 @@ class ApplicationServiceTest extends AbstractIntegrationTest {
     @Autowired
     private ActivityRepository activityRepository;
 
+    @Autowired
+    private OutboxEventRepository outboxEventRepository;
+
+    @MockBean
+    private ResumeClient resumeClient;
+
     @BeforeEach
     void cleanUp() {
         activityRepository.deleteAll();
+        outboxEventRepository.deleteAll();
         applicationRepository.deleteAll();
     }
 
@@ -45,6 +57,7 @@ class ApplicationServiceTest extends AbstractIntegrationTest {
             ApplicationStatus.APPLIED,
             null,
             "Great team",
+            null,
             new ReferralInfoRequest(true, "Jane", "jane@stripe.com", "Coworker")
         );
 
@@ -53,6 +66,11 @@ class ApplicationServiceTest extends AbstractIntegrationTest {
         assertThat(created.getId()).isNotNull();
         assertThat(created.getUserId()).isEqualTo("user-a");
         assertThat(activityRepository.findAll()).hasSize(1);
+        assertThat(outboxEventRepository.findAll()).hasSize(1);
+        assertThat(outboxEventRepository.findAll().getFirst().getEventType())
+            .isEqualTo(EventTypes.APPLICATION_CREATED);
+        assertThat(outboxEventRepository.findAll().getFirst().getStatus())
+            .isEqualTo(OutboxEventStatus.PENDING);
     }
 
     @Test
@@ -68,6 +86,7 @@ class ApplicationServiceTest extends AbstractIntegrationTest {
                 ApplicationStatus.APPLIED,
                 null,
                 null,
+                null,
                 null
             )
         );
@@ -77,6 +96,10 @@ class ApplicationServiceTest extends AbstractIntegrationTest {
         assertThat(applicationRepository.findById(application.getId()).orElseThrow().getStatus())
             .isEqualTo(ApplicationStatus.INTERVIEWING);
         assertThat(activityRepository.findAll()).hasSize(2);
+        assertThat(outboxEventRepository.findAll()).hasSize(2);
+        assertThat(outboxEventRepository.findAll().stream()
+            .anyMatch(event -> EventTypes.APPLICATION_STATUS_CHANGED.equals(event.getEventType())))
+            .isTrue();
     }
 
     @Test
@@ -90,6 +113,7 @@ class ApplicationServiceTest extends AbstractIntegrationTest {
                 null,
                 ApplicationSource.OTHER,
                 ApplicationStatus.WISHLIST,
+                null,
                 null,
                 null,
                 null
@@ -113,6 +137,7 @@ class ApplicationServiceTest extends AbstractIntegrationTest {
                 ApplicationStatus.WISHLIST,
                 null,
                 null,
+                null,
                 null
             )
         );
@@ -127,6 +152,7 @@ class ApplicationServiceTest extends AbstractIntegrationTest {
                 ApplicationStatus.INTERVIEWING,
                 null,
                 null,
+                null,
                 null
             )
         );
@@ -139,6 +165,7 @@ class ApplicationServiceTest extends AbstractIntegrationTest {
                 null,
                 ApplicationSource.LINKEDIN,
                 ApplicationStatus.REJECTED,
+                null,
                 null,
                 null,
                 null

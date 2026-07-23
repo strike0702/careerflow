@@ -1,28 +1,43 @@
 import { APPLICATION_STATUS_LABELS } from '@/lib/constants'
 import type { ApplicationStatus } from '@/types/application'
 
-export function formatDate(value: string | null | undefined): string {
-  if (!value) return '—'
+/** Parses ISO strings or epoch seconds/millis from legacy API responses. */
+function toDate(value: string | number): Date {
+  if (typeof value === 'number') {
+    const millis = value < 1_000_000_000_000 ? value * 1000 : value
+    return new Date(millis)
+  }
+  return new Date(value)
+}
+
+export function formatDate(value: string | number | null | undefined): string {
+  if (value == null || value === '') return '—'
+  const date = toDate(value)
+  if (Number.isNaN(date.getTime())) return '—'
   return new Intl.DateTimeFormat(undefined, {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
-  }).format(new Date(value))
+  }).format(date)
 }
 
-export function formatDateTime(value: string | null | undefined): string {
-  if (!value) return '—'
+export function formatDateTime(value: string | number | null | undefined): string {
+  if (value == null || value === '') return '—'
+
+  const date = toDate(value)
+  if (Number.isNaN(date.getTime())) return '—'
+
   return new Intl.DateTimeFormat(undefined, {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
     hour: 'numeric',
     minute: '2-digit',
-  }).format(new Date(value))
+  }).format(date)
 }
 
-export function formatRelativeTime(value: string): string {
-  const date = new Date(value)
+export function formatRelativeTime(value: string | number): string {
+  const date = toDate(value)
   const diffMs = date.getTime() - Date.now()
   const diffMinutes = Math.round(diffMs / 60_000)
   const rtf = new Intl.RelativeTimeFormat(undefined, { numeric: 'auto' })

@@ -7,14 +7,24 @@ import { MetricCards } from '@/features/dashboard/components/MetricCards'
 import { RecentActivityFeed } from '@/features/dashboard/components/RecentActivityFeed'
 import { StatusChart } from '@/features/dashboard/components/StatusChart'
 import { useDashboard, useRecentActivities } from '@/features/dashboard/hooks/useDashboard'
+import { useInterviewStats } from '@/features/interviews/hooks/useInterviews'
 import { ProfileCompletionBanner } from '@/features/profile/components/ProfileCompletionBanner'
 import { ROUTES } from '@/routes/paths'
 
 export function DashboardPage() {
   const dashboardQuery = useDashboard()
+  const interviewStatsQuery = useInterviewStats()
   const activitiesQuery = useRecentActivities(10)
 
-  const isLoading = dashboardQuery.isLoading || activitiesQuery.isLoading
+  const mergedDashboard = dashboardQuery.data
+    ? {
+        ...dashboardQuery.data,
+        activeInterviews:
+          interviewStatsQuery.data?.activeInterviews ?? dashboardQuery.data.activeInterviews,
+      }
+    : undefined
+
+  const isLoading = dashboardQuery.isLoading || activitiesQuery.isLoading || interviewStatsQuery.isLoading
   const isEmpty = dashboardQuery.data?.totalApplications === 0
 
   if (dashboardQuery.isError) {
@@ -62,9 +72,9 @@ export function DashboardPage() {
         />
       ) : (
         <>
-          <MetricCards data={dashboardQuery.data} isLoading={dashboardQuery.isLoading} />
+          <MetricCards data={mergedDashboard} isLoading={isLoading} />
           <div className="grid gap-6 lg:grid-cols-2">
-            <StatusChart data={dashboardQuery.data} isLoading={dashboardQuery.isLoading} />
+            <StatusChart data={mergedDashboard} isLoading={isLoading} />
             <RecentActivityFeed
               activities={activitiesQuery.data}
               isLoading={activitiesQuery.isLoading}

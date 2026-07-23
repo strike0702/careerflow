@@ -4,6 +4,9 @@ server:
 spring:
   application:
     name: application-service
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev}
   datasource:
@@ -26,6 +29,21 @@ spring:
       resourceserver:
         jwt:
           jwk-set-uri: ${KEYCLOAK_JWK_SET_URI:http://localhost:8080/realms/careerflow-realm/protocol/openid-connect/certs}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+
+careerflow:
+  clients:
+    resume-service:
+      url: ${RESUME_SERVICE_URL:http://localhost:8082}
+  events:
+    kafka:
+      enabled: true
+    application-topic: careerflow.application.events
+    outbox:
+      poll-interval-ms: 5000
+      batch-size: 50
+      max-attempts: 5
 
 management:
   endpoints:

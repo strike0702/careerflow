@@ -25,6 +25,7 @@ import {
   createApplicationSchema,
   type CreateApplicationFormValues,
 } from '@/features/applications/schemas/createApplicationSchema'
+import { useResumes } from '@/features/resumes/hooks/useResumes'
 import { APPLICATION_SOURCE_LABELS, APPLICATION_STATUS_LABELS } from '@/lib/constants'
 import type { CreateApplicationRequest } from '@/types/application'
 
@@ -42,6 +43,7 @@ const defaultValues: CreateApplicationFormValues = {
   status: 'WISHLIST',
   applicationDate: '',
   notes: '',
+  resumeId: '',
   referred: false,
   referrerName: '',
   referrerCompanyEmail: '',
@@ -49,6 +51,7 @@ const defaultValues: CreateApplicationFormValues = {
 }
 
 export function ApplicationForm({ onSubmit, isSubmitting }: ApplicationFormProps) {
+  const { data: resumes = [] } = useResumes()
   const form = useForm<CreateApplicationFormValues>({
     resolver: zodResolver(createApplicationSchema),
     defaultValues,
@@ -66,6 +69,7 @@ export function ApplicationForm({ onSubmit, isSubmitting }: ApplicationFormProps
       jobUrl: values.jobUrl || null,
       applicationDate: values.applicationDate || null,
       notes: values.notes || null,
+      resumeId: values.resumeId?.trim() && values.resumeId !== 'none' ? values.resumeId : null,
       referralInfo: values.referred
         ? {
             referred: true,
@@ -196,6 +200,34 @@ export function ApplicationForm({ onSubmit, isSubmitting }: ApplicationFormProps
                   <FormControl>
                     <Input type="date" {...field} />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="resumeId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Resume</FormLabel>
+                  <Select
+                    onValueChange={(value) => field.onChange(value === 'none' ? '' : value)}
+                    value={field.value || 'none'}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select resume (optional)" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="none">None</SelectItem>
+                      {resumes.map((resume) => (
+                        <SelectItem key={resume.id} value={resume.id}>
+                          {resume.label} (v{resume.versionNo})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}

@@ -17,6 +17,7 @@ public record ApplicationResponse(
     ApplicationStatus status,
     LocalDate applicationDate,
     String notes,
+    UUID resumeId,
     ReferralInfoResponse referralInfo,
     Instant createdAt,
     Instant updatedAt,

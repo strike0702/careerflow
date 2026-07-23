@@ -38,6 +38,7 @@ export interface Application {
   status: ApplicationStatus
   applicationDate: string | null
   notes: string | null
+  resumeId: string | null
   referralInfo: ReferralInfo | null
   createdAt: string
   updatedAt: string
@@ -71,6 +72,7 @@ export interface CreateApplicationRequest {
   status?: ApplicationStatus
   applicationDate?: string | null
   notes?: string | null
+  resumeId?: string | null
   referralInfo?: ReferralInfo | null
 }
 

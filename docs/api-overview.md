@@ -31,8 +31,8 @@ grant_type=password&client_id=careerflow-api-gateway&username=candidate@careerfl
 |-------------|----------|--------|
 | `/api/v1/users/**` | User Service `:8081` | Implemented |
 | `/api/v1/applications/**` | Application Service `:8083` | Implemented |
-| `/api/v1/resumes/**` | Resume Service `:8082` | **Not implemented** |
-| `/api/v1/interviews/**` | Interview Service `:8084` | **Not implemented** |
+| `/api/v1/resumes/**` | Resume Service `:8082` | Implemented |
+| `/api/v1/interviews/**` | Interview Service `:8084` | Implemented |
 
 Actuator (no auth required):
 
@@ -175,6 +175,7 @@ Authentication: Valid JWT required. All data scoped to JWT `sub`.
 | `source` | Yes | Enum — see below |
 | `status` | No | Defaults to `WISHLIST` |
 | `jobUrl` | No | Must be valid URL if provided |
+| `resumeId` | No | UUID of an owned resume; validated via Resume Service |
 | `referralInfo` | No | Embedded value object |
 
 **Response `201 Created`:**
@@ -510,16 +511,13 @@ User Service does not yet have a global exception handler.
 
 ## Planned APIs (Not Implemented)
 
-The following are documented in [api-contracts.md](./api-contracts.md) but **do not exist** in code:
-
-- Resume Service (`/api/v1/resumes/**`)
-- Interview Service (`/api/v1/interviews/**`)
-
-Gateway routes for these paths will fail until services are implemented.
+See Bruno collections under **Resume Service** and **Interview Service** for implemented endpoints. Resume create requires `storageUrl` (HTTPS URL, e.g. Google Drive link); `fileName` is optional and derived from the URL when omitted.
 
 ---
 
-## Bruno Collection Mapping
+## Bruno Collection Mapping (legacy note)
+
+The section below lists core requests. Resume and Interview collections are also available under `bruno/Resume Service/` and `bruno/Interview Service/`.
 
 | Bruno request | Endpoint |
 |---------------|----------|
@@ -533,5 +531,7 @@ Gateway routes for these paths will fail until services are implemented.
 | Get Current User | `GET /api/v1/users/me` |
 | Get Candidate Profile | `GET /api/v1/users/me/profile` |
 | Update Candidate Profile | `PUT /api/v1/users/me/profile` |
+| Create Resume | `POST /api/v1/resumes` |
+| List Resumes | `GET /api/v1/resumes` |
 
 Use `{{applicationId}}` variable in Bruno for ID-based requests after creating an application.

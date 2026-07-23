@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.URL;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 public record CreateApplicationRequest(
     @NotBlank String companyName,
@@ -18,6 +19,7 @@ public record CreateApplicationRequest(
     ApplicationStatus status,
     LocalDate applicationDate,
     String notes,
+    UUID resumeId,
     @Valid ReferralInfoRequest referralInfo
 ) {
 }

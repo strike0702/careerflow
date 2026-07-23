@@ -1,6 +1,6 @@
 # CareerFlow Project Status
 
-Last updated: July 2026 (post Phase 4.1)
+Last updated: July 2026 (post Phase 6)
 
 ---
 
@@ -19,12 +19,14 @@ graph LR
     Client[Client / Bruno] -->|Bearer JWT| Gateway[API Gateway :9000]
     Gateway --> UserService[User Service :8081]
     Gateway --> AppService[Application Service :8083]
-    Gateway -.->|Planned| ResumeService[Resume Service :8082]
-    Gateway -.->|Planned| InterviewService[Interview Service :8084]
+    Gateway --> ResumeService[Resume Service :8082]
+    Gateway --> InterviewService[Interview Service :8084]
 
     Keycloak[Keycloak :8080] -->|Issues JWT| Client
     UserService --> UserDB[(careerflow_user)]
     AppService --> AppDB[(careerflow_application)]
+    ResumeService --> ResumeDB[(careerflow_resume)]
+    InterviewService --> InterviewDB[(careerflow_interview)]
     Keycloak --> KCDB[(keycloak_db)]
 ```
 
@@ -36,16 +38,17 @@ Clients authenticate with Keycloak, call the API Gateway with a JWT, and each do
 
 | Area | Status |
 |------|--------|
-| Infrastructure (Docker Compose, PostgreSQL, Keycloak) | **Completed** |
+| Infrastructure (Docker Compose, PostgreSQL, Keycloak, Kafka) | **Completed** |
 | API Gateway (path routing) | **Completed** |
 | User Service (profile + JWT sync) | **Completed** (with known gaps — see limitations) |
 | Application Service (applications, offers, activities, dashboard) | **Completed** |
-| Resume Service | **Planned** |
-| Interview Service | **Planned** |
+| Resume Service | **Completed** |
+| Interview Service | **Completed** |
 | Shared observability module | **Completed** |
 | Frontend (React SPA) | **Completed** |
+| Notification Service (event consumer stub) | **Completed** |
 | CI/CD | **Planned** |
-| Event-driven architecture (Kafka) | **Planned** |
+| Event-driven architecture (Kafka) | **Completed** |
 
 ---
 
@@ -107,6 +110,28 @@ Clients authenticate with Keycloak, call the API Gateway with a JWT, and each do
 - Frontend profile completion banner on the dashboard (`ProfileCompletionBanner`): dismissible nudge when profile lacks target role or skill; links to `/profile` without blocking other routes
 - No backend or database changes — lazy `User`/`CandidateProfile` sync (`UserService.getOrSyncUser`) is unchanged; see [ADR-008](./decisions/ADR-008-self-service-registration-and-onboarding.md)
 
+### Phase 5 — Event-Driven Architecture ✅
+
+- Apache Kafka (KRaft) + Kafka UI in Docker Compose
+- `shared-events` module: versioned JSON envelope + payload contracts
+- Application Service transactional outbox (`V4` migration) + scheduled poller
+- Domain events: `ApplicationCreated`, `ApplicationStatusChanged`, `OfferAdded`, `OfferUpdated`
+- Notification Service (`:8085`) consumes events with idempotent `processed_events` table
+- Consumer retries + DLT topic; correlation ID propagation via Kafka headers
+- ADR-009: Kafka + outbox + JSON envelope
+
+**Deferred:** Avro/Schema Registry, SMTP/email, in-app notification inbox API.
+
+### Phase 6 — Resume & Interview Management ✅
+
+- Resume Service (`:8082`): CRUD for resume versions, mock storage URLs, parse status metadata, transactional outbox
+- Interview Service (`:8084`): interview rounds, status/outcome, retrospectives, dashboard stats endpoint
+- OpenFeign sync validation: Interview→Application, Application→Resume (ADR-011)
+- Optional `resume_id` on applications (Flyway V5)
+- Domain events: `ResumeUploaded`, `ResumeDeleted`, `InterviewScheduled`, `InterviewCompleted`
+- Frontend: Resumes page, Interviews tab on application detail, dashboard merges interview stats
+- ADR-010, ADR-011
+
 ---
 
 ## Service Responsibilities
@@ -115,9 +140,10 @@ Clients authenticate with Keycloak, call the API Gateway with a JWT, and each do
 |---------|------|----------|------|
 | **API Gateway** | 9000 | None | Routing only; forwards JWT unchanged |
 | **User Service** | 8081 | `careerflow_user` | Users, candidate profiles |
-| **Application Service** | 8083 | `careerflow_application` | Applications, offers, activities |
-| **Resume Service** | 8082 (routed, not implemented) | `careerflow_resume` (planned) | Resume versions |
-| **Interview Service** | 8084 (routed, not implemented) | `careerflow_interview` (planned) | Interview rounds, retros |
+| **Application Service** | 8083 | `careerflow_application` | Applications, offers, activities, outbox events |
+| **Notification Service** | 8085 | `careerflow_notification` | Event consumption, idempotency, stub notifications |
+| **Resume Service** | 8082 | `careerflow_resume` | Resume versions, storage metadata, parse status |
+| **Interview Service** | 8084 | `careerflow_interview` | Interview rounds, retrospectives |
 
 **Ownership rule:** Application Service stores only `userId` (JWT subject). It does not store email, username, or name.
 
@@ -149,9 +175,33 @@ All public APIs use the prefix `/api/v1`. Gateway entry point: `http://localhost
 
 See [api-overview.md](./api-overview.md) for request/response schemas.
 
-### Resume & Interview Services — Planned
+### Resume Service — Implemented
 
-Gateway routes exist for `/api/v1/resumes/**` and `/api/v1/interviews/**`, but no backend modules are implemented.
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/api/v1/resumes` | Create resume version |
+| GET | `/api/v1/resumes` | List user's resumes |
+| GET | `/api/v1/resumes/{id}` | Get resume |
+| PUT | `/api/v1/resumes/{id}` | Update metadata |
+| PUT | `/api/v1/resumes/{id}/primary` | Set as primary |
+| DELETE | `/api/v1/resumes/{id}` | Delete resume |
+
+### Interview Service — Implemented
+
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/api/v1/interviews` | Schedule interview round |
+| GET | `/api/v1/interviews` | List/filter interviews |
+| GET | `/api/v1/interviews/stats` | Dashboard aggregation |
+| GET | `/api/v1/interviews/{id}` | Get interview |
+| PUT | `/api/v1/interviews/{id}` | Update details |
+| PATCH | `/api/v1/interviews/{id}/status` | Update status |
+| PATCH | `/api/v1/interviews/{id}/outcome` | Update outcome |
+| PUT | `/api/v1/interviews/{id}/retrospective` | Upsert retrospective |
+| GET | `/api/v1/interviews/{id}/retrospective` | Get retrospective |
+| DELETE | `/api/v1/interviews/{id}` | Delete interview |
+
+Application create accepts optional `resumeId` (validated via Feign).
 
 ---
 
@@ -159,8 +209,8 @@ Gateway routes exist for `/api/v1/resumes/**` and `/api/v1/interviews/**`, but n
 
 | Component | Location | Notes |
 |-----------|----------|-------|
-| Docker Compose | `infrastructure/docker-compose.yml` | PostgreSQL 16 + Keycloak 24.0.5 |
-| DB init script | `infrastructure/postgres/init.sql` | Creates 5 logical databases |
+| Docker Compose | `infrastructure/docker-compose.yml` | PostgreSQL 16 + Keycloak 24.0.5 + Kafka KRaft + Kafka UI |
+| DB init script | `infrastructure/postgres/init.sql` | Creates 6 logical databases |
 | Keycloak realm | `infrastructure/keycloak/realm-export.json` | Realm, roles, demo users, OAuth client |
 | Gradle monorepo | `backend/` | Spring Boot 3.3, Java 21 |
 | Bruno collection | `bruno/` | OpenCollection YAML requests |
@@ -171,6 +221,7 @@ Gateway routes exist for `/api/v1/resumes/**` and `/api/v1/interviews/**`, but n
 - `careerflow_resume`
 - `careerflow_application`
 - `careerflow_interview`
+- `careerflow_notification`
 - `keycloak_db`
 
 ---
@@ -200,14 +251,16 @@ Demo credentials (Keycloak):
 |----------|-------------------|-------------------|
 | `careerflow_user` | Flyway + Hibernate `validate` | `users`, `candidate_profiles`, `candidate_skills` |
 | `careerflow_application` | Flyway + Hibernate `validate` | `applications`, `offers`, `activities` |
-| `careerflow_resume` | Not implemented | — |
-| `careerflow_interview` | Not implemented | — |
+| `careerflow_resume` | Flyway + Hibernate `validate` | `resumes`, `outbox_events` |
+| `careerflow_interview` | Flyway + Hibernate `validate` | `interviews`, `interview_retrospectives`, `outbox_events` |
 
 Application Service Flyway migrations:
 
 - `V1__create_applications.sql`
 - `V2__create_offers.sql`
 - `V3__create_activities.sql`
+- `V4__create_outbox_events.sql`
+- `V5__add_resume_id_to_applications.sql`
 
 User Service Flyway migrations:
 
@@ -222,7 +275,9 @@ Referral data is embedded in the `applications` table (not a separate `referrals
 
 | Module | Tests | Status |
 |--------|-------|--------|
-| application-service | 8 tests (repository, service, security) | **Passing** (H2 in-memory, `test` profile) |
+| application-service | 8 tests | **Passing** |
+| resume-service | 2 tests (security) | **Passing** |
+| interview-service | 2 tests (security) | **Passing** |
 | user-service | 7 tests (repository, service, security) | **Passing** (H2 in-memory, `test` profile) |
 | api-gateway | None | **Not implemented** |
 
@@ -231,7 +286,7 @@ Critical security tests: cross-user application access returns 404; unauthentica
 Run tests:
 
 ```bash
-cd backend && ./gradlew :application-service:test :user-service:test
+cd backend && ./gradlew :application-service:test :user-service:test :resume-service:test :interview-service:test
 ```
 
 ---
@@ -248,17 +303,18 @@ cd backend && ./gradlew :application-service:test :user-service:test
 - **Correlation IDs** (`X-Request-ID`) and structured logging via `shared-common`
 - **Global exception handler** with RFC 7807 `ProblemDetail` responses (`shared-common`)
 - **Prometheus metrics** and liveness/readiness probes
-- **Bruno** OpenCollection for manual API testing
+- **Transactional outbox** + Kafka domain events (`shared-events`, ADR-009)
+- **Notification Service** stub consumer with idempotent `processed_events`
 
 ---
 
 ## Current Limitations
 
-1. **Resume and Interview services** are routed by the gateway but not implemented.
-2. **No `@PreAuthorize` role checks** on controllers despite Keycloak roles being mapped (deferred).
+1. **No `@PreAuthorize` role checks** on controllers despite Keycloak roles being mapped (deferred).
 3. **Gateway does not validate JWTs** — invalid tokens fail at downstream services.
 4. **No CI/CD pipeline**.
-5. **No distributed tracing** (OpenTelemetry) — correlation IDs provide log-level tracing only.
+5. **No real email/SMS notifications** — stub logging only; SMTP deferred.
+6. **No distributed tracing** (OpenTelemetry) — correlation IDs provide log-level tracing only.
 
 ---
 
@@ -266,10 +322,11 @@ cd backend && ./gradlew :application-service:test :user-service:test
 
 See [technical-debt.md](./technical-debt.md) and [decisions/](./decisions/) for detailed tracking.
 
-High-priority items for Phase 5+:
+High-priority items for Phase 6+:
 
-- Event-driven architecture (Kafka)
 - `@PreAuthorize` role enforcement (when additional services justify shared security module)
+- Avro/Schema Registry for event contracts
+- Real email delivery (SMTP)
 
 ---
 
@@ -279,6 +336,4 @@ See [roadmap.md](./roadmap.md) for the full plan.
 
 | Phase | Focus |
 |-------|-------|
-| **Phase 5** | Event-driven architecture (Kafka, notifications) |
-| **Phase 6** | Resume management service |
 | **Phase 7** | Deployment (CI/CD, cloud, monitoring) |

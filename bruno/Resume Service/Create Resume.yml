@@ -1,0 +1,24 @@
+info:
+  name: Create Resume
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: http://localhost:8082/api/v1/resumes
+  auth: inherit
+  body:
+    type: json
+    data: |-
+      {
+        "label": "Backend v1",
+        "storageUrl": "https://drive.google.com/file/d/abc123/view",
+        "contentType": "application/pdf",
+        "notes": "Tailored for backend roles"
+      }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
